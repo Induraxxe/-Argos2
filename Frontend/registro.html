@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6A1B9A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+    <title>Argos2 - Registro</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos adicionales para la página de registro */
+        
+        .registro-container {
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .registro-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .registro-header .logo {
+            width: 80px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .registro-header .icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .registro-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #registro-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .input-group.optional label {
+            color: var(--color-text-secondary);
+        }
+
+        .document-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .document-group label {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-text);
+        }
+
+        .document-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .document-row select {
+            padding: 12px 15px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--color-text);
+            font-size: 16px;
+            font-weight: 400;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .document-row select:focus {
+            border-color: var(--color-focus);
+            box-shadow: 0 0 0 3px var(--color-focus);
+        }
+
+        .document-row select option {
+            background: #2a2a2a;
+            color: var(--color-text);
+        }
+
+        .document-row .input-group {
+            flex: 1;
+        }
+
+        .document-row .input-group label {
+            display: none;
+        }
+
+        .document-row .input-group input {
+            padding-left: 45px;
+        }
+
+        .document-row .input-group .input-icon {
+            left: 15px;
+        }
+
+        #btn-crear {
+            width: 100%;
+            padding: 14px 40px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--color-primary);
+            color: var(--color-text);
+            margin-top: 10px;
+        }
+
+        #btn-crear:hover {
+            background: var(--color-primary-hover);
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(106, 27, 154, 0.4);
+        }
+
+        #btn-crear:disabled {
+            background: var(--glass-border);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .link-volver {
+            text-align: center;
+        }
+
+        .link-volver a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .link-volver a:hover {
+            color: var(--color-text);
+        }
+
+        /* Validación de campos */
+        .input-group input.valid {
+            border-color: var(--color-success);
+        }
+
+        .input-group input.invalid {
+            border-color: var(--color-error);
+        }
+
+        .input-group .validation-message {
+            font-size: 12px;
+            margin-top: 5px;
+            padding-left: 50px;
+            display: none;
+        }
+
+        .input-group .validation-message.error {
+            display: block;
+            color: var(--color-error);
+        }
+
+        .input-group .validation-message.success {
+            display: block;
+            color: var(--color-success);
+        }
+
+        /* Scrollbar personalizado */
+        .registro-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .registro-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .registro-container::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 4px;
+        }
+
+        .registro-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .registro-container {
+                padding: 30px 20px;
+                max-height: 95vh;
+            }
+
+            .document-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .document-row select {
+                width: 100%;
+            }
+
+            .document-row .input-group input {
+                padding-left: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="registro-container glass-container">
+        <!-- Header -->
+        <div class="registro-header">
+            <img src="assets/img/Logo.png" alt="Argos2 Logo" class="logo">
+            <img src="assets/icons/monitor.svg" alt="Monitor" class="icon">
+            <h1>Registro</h1>
+        </div>
+
+        <!-- Registro Form -->
+        <form id="registro-form">
+            <!-- Sección: Datos Personales -->
+            <div class="form-section">
+                <h3>Datos Personales</h3>
+
+                <!-- Nombre Completo -->
+                <div class="input-group">
+                    <label for="nombre-completo">NOMBRE COMPLETO *</label>
+                    <div class="input-wrapper">
+                        <img src="assets/icons/usuario.svg" alt="Usuario" class="input-icon">
+                        <input type="text" id="nombre-completo" name="nombre_completo" placeholder="Ej: Juan Pérez" required autocomplete="name">
+                    </div>
+                    <span class="validation-message" id="nombre-completo-msg"></span>
+                </div>
+
+                <!-- Fecha de Nacimiento -->
+                <div class="input-group">
+                    <label for="fecha-nacimiento">FECHA DE NACIMIENTO *</label>
+                    <div class="input-wrapper">
+                        <img src="assets/icons/calendario.svg" alt="Calendario" class="input-icon">
+                        <input type="date" id="fecha-nacimiento" name="fecha_nacimiento" required>
+                    </div>
+                    <span class="validation-message" id="fecha-nacimiento-msg"></span>
+                </div>
+
+                <!-- Teléfono (Opcional) -->
+                <div class="input-group optional">
+                    <label for="telefono">TELÉFONO - Opcional</label>
+                    <div class="input-wrapper">
+                        <img src="assets/icons/telefono.svg" alt="Teléfono" class="input-icon">
+                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 04141234567" autocomplete="tel">
+                    </div>
+                    <span class="validation-message" id="telefono-msg"></span>
+                </div>
+
+                <!-- Documento de Identidad -->
+                <div class="document-group">
+                    <label>DOCUMENTO DE IDENTIDAD *</label>
+                    <div class="document-row">
+                        <select id="tipo-documento" name="tipo_documento" required>
+                            <option value="V">V - Cédula</option>
+                            <option value="P">P - Pasaporte</option>
+                        </select>
+                        <div class="input-group">
+                            <label for="numero-documento">NÚMERO</label>
+                            <div class="input-wrapper">
+                                <img src="assets/icons/documento.svg" alt="Documento" class="input-icon">
+                                <input type="text" id="numero-documento" name="numero_documento" placeholder="Número" required autocomplete="off">
+                            </div>
+                            <span class="validation-message" id="documento-msg"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Datos de Cuenta -->
+            <div class="form-section">
+                <h3>Datos de Cuenta</h3>
+
+                <!-- Correo -->
+                <div class="input-group">
+                    <label for="email">CORREO *</label>
+                    <div class="input-wrapper">
+                        <img src="assets/icons/sobre.svg" alt="Correo" class="input-icon">
+                        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required autocomplete="email">
+                    </div>
+                    <span class="validation-message" id="email-msg"></span>
+                </div>
+
+                <!-- Usuario -->
+                <div class="input-group">
+                    <label for="username">USUARIO *</label>
+                    <div class="input-wrapper">
+                        <img src="assets/icons/usuario.svg" alt="Usuario" class="input-icon">
+                        <input type="text" id="username" name="username" placeholder="Nombre de usuario" required autocomplete="username">
+                    </div>
+                    <span class="validation-message" id="username-msg"></span>
+                </div>
+
+                <!-- Clave -->
+                <div class="input-group">
+                    <label for="password">CLAVE *</label>
+                    <div class="input-wrapper">
+                        <img src="assets/icons/llave.svg" alt="Clave" class="input-icon">
+                        <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
+                    </div>
+                    <span class="validation-message" id="password-msg"></span>
+                </div>
+
+                <!-- Confirmar Clave -->
+                <div class="input-group">
+                    <label for="confirm-password">CONFIRMAR CLAVE *</label>
+                    <div class="input-wrapper">
+                        <img src="assets/icons/llave.svg" alt="Confirmar Clave" class="input-icon">
+                        <input type="password" id="confirm-password" name="confirm_password" placeholder="Repita su clave" required autocomplete="new-password">
+                    </div>
+                    <span class="validation-message" id="confirm-password-msg"></span>
+                </div>
+            </div>
+
+            <!-- Botón Crear Cuenta -->
+            <button type="submit" id="btn-crear">CREAR CUENTA</button>
+        </form>
+
+        <!-- Link Volver -->
+        <div class="link-volver">
+            <a href="index.html">Ya tengo cuenta - Iniciar Sesión</a>
+        </div>
+
+        <!-- Message Container -->
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/toast.js?v=20260505b"></script>
+    <script src="js/auth2.js"></script>
+    <script>
+        // ============================================
+        // Configuración de Fecha de Nacimiento
+        // ============================================
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+
+        const fechaNacimientoInput = document.getElementById('fecha-nacimiento');
+        fechaNacimientoInput.max = maxDate.toISOString().split('T')[0];
+        fechaNacimientoInput.min = minDate.toISOString().split('T')[0];
+
+        // ============================================
+        // Event Listeners - Registro
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const registroForm = document.getElementById('registro-form');
+            const btnCrear = document.getElementById('btn-crear');
+            const tipoDocumento = document.getElementById('tipo-documento');
+            const numeroDocumento = document.getElementById('numero-documento');
+            const emailInput = document.getElementById('email');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const telefonoInput = document.getElementById('telefono');
+
+            // Validar documento al perder foco
+            numeroDocumento.addEventListener('blur', async () => {
+                const tipo = tipoDocumento.value;
+                const numero = numeroDocumento.value.trim();
+                const msgEl = document.getElementById('documento-msg');
+
+                if (!numero) {
+                    numeroDocumento.classList.remove('valid', 'invalid');
+                    msgEl.textContent = '';
+                    msgEl.className = 'validation-message';
+                    return;
+                }
+
+                // Validar formato
+                const docValidation = validateDocument(tipo, numero);
+                if (!docValidation.valid) {
+                    numeroDocumento.classList.add('invalid');
+                    numeroDocumento.classList.remove('valid');
+                    msgEl.textContent = docValidation.message;
+                    msgEl.className = 'validation-message error';
+                    return;
+                }
+
+                // Validar unicidad
+                try {
+                    msgEl.textContent = 'Verificando unicidad...';
+                    msgEl.className = 'validation-message';
+
+                    const result = await validateDocumentUnique(tipo, numero);
+
+                    if (result.valid) {
+                        numeroDocumento.classList.add('valid');
+                        numeroDocumento.classList.remove('invalid');
+                        msgEl.textContent = 'Documento disponible';
+                        msgEl.className = 'validation-message success';
+                    } else {
+                        numeroDocumento.classList.add('invalid');
+                        numeroDocumento.classList.remove('valid');
+                        msgEl.textContent = result.message;
+                        msgEl.className = 'validation-message error';
+                    }
+                } catch (error) {
+                    console.error('Error validando documento:', error);
+                }
+            });
+
+            // Validar teléfono al perder foco
+            telefonoInput.addEventListener('blur', () => {
+                const telefono = telefonoInput.value.trim();
+                const msgEl = document.getElementById('telefono-msg');
+
+                if (!telefono) {
+                    telefonoInput.classList.remove('valid', 'invalid');
+                    msgEl.textContent = '';
+                    msgEl.className = 'validation-message';
+                    return;
+                }
+
+                if (validatePhone(telefono)) {
+                    telefonoInput.classList.add('valid');
+                    telefonoInput.classList.remove('invalid');
+                    msgEl.textContent = 'Formato válido';
+                    msgEl.className = 'validation-message success';
+                } else {
+                    telefonoInput.classList.add('invalid');
+                    telefonoInput.classList.remove('valid');
+                    msgEl.textContent = 'Formato inválido (0414-0424, 11 dígitos)';
+                    msgEl.className = 'validation-message error';
+                }
+            });
+
+            // Validar email al perder foco
+            emailInput.addEventListener('blur', () => {
+                const email = emailInput.value.trim();
+                const msgEl = document.getElementById('email-msg');
+
+                if (!email) {
+                    emailInput.classList.remove('valid', 'invalid');
+                    msgEl.textContent = '';
+                    msgEl.className = 'validation-message';
+                    return;
+                }
+
+                if (validateEmail(email)) {
+                    emailInput.classList.add('valid');
+                    emailInput.classList.remove('invalid');
+                    msgEl.textContent = 'Formato válido';
+                    msgEl.className = 'validation-message success';
+                } else {
+                    emailInput.classList.add('invalid');
+                    emailInput.classList.remove('valid');
+                    msgEl.textContent = 'Formato de correo inválido';
+                    msgEl.className = 'validation-message error';
+                }
+            });
+
+            // Validar contraseña en tiempo real
+            passwordInput.addEventListener('input', () => {
+                const password = passwordInput.value;
+                const msgEl = document.getElementById('password-msg');
+
+                if (!password) {
+                    passwordInput.classList.remove('valid', 'invalid');
+                    msgEl.textContent = '';
+                    msgEl.className = 'validation-message';
+                    return;
+                }
+
+                const validation = validatePassword(password);
+                if (validation.valid) {
+                    passwordInput.classList.add('valid');
+                    passwordInput.classList.remove('invalid');
+                    msgEl.textContent = 'Contraseña válida';
+                    msgEl.className = 'validation-message success';
+                } else {
+                    passwordInput.classList.add('invalid');
+                    passwordInput.classList.remove('valid');
+                    msgEl.textContent = validation.message;
+                    msgEl.className = 'validation-message error';
+                }
+
+                // Verificar coincidencia con confirmar
+                if (confirmPasswordInput.value) {
+                    confirmPasswordInput.dispatchEvent(new Event('input'));
+                }
+            });
+
+            // Validar confirmación de contraseña
+            confirmPasswordInput.addEventListener('input', () => {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const msgEl = document.getElementById('confirm-password-msg');
+
+                if (!confirmPassword) {
+                    confirmPasswordInput.classList.remove('valid', 'invalid');
+                    msgEl.textContent = '';
+                    msgEl.className = 'validation-message';
+                    return;
+                }
+
+                if (password === confirmPassword) {
+                    confirmPasswordInput.classList.add('valid');
+                    confirmPasswordInput.classList.remove('invalid');
+                    msgEl.textContent = 'Las contraseñas coinciden';
+                    msgEl.className = 'validation-message success';
+                } else {
+                    confirmPasswordInput.classList.add('invalid');
+                    confirmPasswordInput.classList.remove('valid');
+                    msgEl.textContent = 'Las contraseñas no coinciden';
+                    msgEl.className = 'validation-message error';
+                }
+            });
+
+            // Enviar formulario
+            registroForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Recopilar datos
+                const userData = {
+                    nombre_completo: document.getElementById('nombre-completo').value.trim(),
+                    fecha_nacimiento: document.getElementById('fecha-nacimiento').value,
+                    telefono: document.getElementById('telefono').value.trim() || null,
+                    tipo_documento: tipoDocumento.value,
+                    numero_documento: numeroDocumento.value.trim(),
+                    email: emailInput.value.trim(),
+                    username: usernameInput.value.trim(),
+                    password: passwordInput.value
+                };
+
+                // Validar todos los campos
+                const fieldsValidation = validateFields({
+                    'Nombre completo': userData.nombre_completo,
+                    'Fecha de nacimiento': userData.fecha_nacimiento,
+                    'Documento': userData.numero_documento,
+                    'Correo': userData.email,
+                    'Usuario': userData.username,
+                    'Contraseña': userData.password
+                });
+
+                if (!fieldsValidation.valid) {
+                    showToast(fieldsValidation.message, 'warning');
+                    return;
+                }
+
+                // Validar contraseña
+                const passwordValidation = validatePassword(userData.password);
+                if (!passwordValidation.valid) {
+                    showToast(passwordValidation.message, 'error');
+                    return;
+                }
+
+                // Validar coincidencia de contraseñas
+                if (userData.password !== confirmPasswordInput.value) {
+                    showToast('Las contraseñas no coinciden', 'error');
+                    return;
+                }
+
+                // Validar documento
+                const docValidation = validateDocument(userData.tipo_documento, userData.numero_documento);
+                if (!docValidation.valid) {
+                    showToast(docValidation.message, 'error');
+                    return;
+                }
+
+                // Validar teléfono si se proporcionó
+                if (userData.telefono && !validatePhone(userData.telefono)) {
+                    showToast('Formato de teléfono inválido', 'error');
+                    return;
+                }
+
+                // Validar email
+                if (!validateEmail(userData.email)) {
+                    showToast('Formato de correo inválido', 'error');
+                    return;
+                }
+
+                // Validar fecha de nacimiento
+                const birthDate = new Date(userData.fecha_nacimiento);
+                const age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (age < 18 || (age === 18 && monthDiff < 0)) {
+                    showToast('Debes ser mayor de 18 años para registrarte', 'error');
+                    return;
+                }
+
+                if (age > 100) {
+                    showToast('Fecha de nacimiento inválida', 'error');
+                    return;
+                }
+
+                // Deshabilitar botón durante el proceso
+                btnCrear.disabled = true;
+                btnCrear.textContent = 'REGISTRANDO...';
+
+                try {
+                    showToast('Procesando registro...', 'info');
+
+                    const result = await register(userData);
+
+                    if (result && result.message) {
+                        showToast(result.message, 'success');
+                        
+                        // Redirigir a verificación con email en query param
+                        setTimeout(() => {
+                            window.location.href = `verificacion.html?email=${encodeURIComponent(userData.email)}`;
+                        }, 1500);
+                    }
+                } catch (error) {
+                    console.error('Error en registro:', error);
+                    showToast(error.message || 'Error al registrar usuario', 'error');
+                } finally {
+                    // Rehabilitar botón
+                    btnCrear.disabled = false;
+                    btnCrear.textContent = 'CREAR CUENTA';
+                }
+            });
+        });
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('[SW] Registrado:', reg.scope))
+                    .catch(err => console.warn('[SW] Error al registrar:', err));
+            });
+        }
+    </script>
+</body>
+</html>

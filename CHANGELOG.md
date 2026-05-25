@@ -1,0 +1,1339 @@
+# Changelog
+
+## [2026-05-25] - Documentación completa del proyecto para GitHub
+
+- **Archivos Modificados:** `README.md`, `install.bat`, `install.sh`, `.env.example`, `Backend/uploads/.gitkeep`, `Backend/processed/.gitkeep`
+- **Archivos Creados:** `README.md`, `Backend/uploads/.gitkeep`, `Backend/processed/.gitkeep`
+- **Acción:** Añadido / Modificado
+- **Descripción Técnica:** Creación de README.md profesional para GitHub con documentación completa del proyecto: descripción, características, arquitectura, stack tecnológico, requisitos previos, instalación rápida (automática y manual), inicio del servidor, API endpoints, seguridad, base de datos, PWA, variables de entorno y guía para crear el primer administrador. Verificación y corrección de scripts de instalación: validación de Python ≥3.8 en install.bat e install.sh, corrección de comando python en install.sh, variables EMAIL_SMTP/EMAIL_PORT en .env.example, y archivos .gitkeep para directorios uploads/ y processed/.
+- **Estado:** Completado
+
+## [2026-05-25] - Correcciones Errores 13, 14, 15 (Último Lote) — Query Params, Console.log y Verificación de Rutas
+- **Archivos Modificados:** `Frontend/index.html`, `Frontend/js/auth2.js`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Error 13 (VIGENTE → RESUELTO):** Agregada lectura de parámetros URL `?verified=true` y `?reset=true` en `Frontend/index.html` dentro del `DOMContentLoaded`. Usa `URLSearchParams` para detectar los parámetros, `showToast()` para mostrar mensajes al usuario, y `window.history.replaceState()` para limpiar la URL sin recargar.
+  - **Error 14 (VIGENTE → RESUELTO):** Eliminadas 15 ocurrencias de `console.log/warn/error` de `Frontend/js/auth2.js` (11 ocurrencias) y `Frontend/index.html` (4 ocurrencias). Incluía líneas críticas que exponían datos de sesión y tokens en la consola del navegador.
+  - **Error 15 (RESUELTO):** Verificado que las rutas `/dashboard.html` y `/admin.html` ya existen en `Backend/app.py` líneas 108-116 (agregadas en Batch 1 Error 7). Sin cambios necesarios.
+- **Estado:** Completado
+
+## [2026-05-25] - Correcciones B2-6 a B2-10 — Seguridad del Flujo de Autenticación Frontend
+- **Archivos Modificados:** `Frontend/js/auth2.js`, `Frontend/js/admin.js`, `Frontend/js/vision.js`, `Frontend/dashboard.html`, `Frontend/admin.html`, `Frontend/reset-password.html`, `Frontend/js/reset-password.js`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **B2-10:** Movida `getAccessToken()` de `admin.js` y `vision.js` a `auth2.js` (ya cargado en todas las páginas). Eliminada `formatDocument()` duplicada de `admin.js`. Actualizados exports en ambos archivos.
+  - **B2-6:** Agregadas funciones `getRefreshToken()`, `refreshAccessToken()` y `authenticatedFetch()` en `auth2.js`. Reemplazadas 4 llamadas `fetch` en `admin.js` y 2 en `vision.js` por `authenticatedFetch()`. Agregado lock `safeRefresh()` para evitar refreshes paralelos. El frontend ahora renueva tokens automáticamente antes de que expiren.
+  - **B2-7:** Agregada función `isTokenExpired()` que decodifica JWT con `atob()` sin librerías externas. Modificada `isLoggedIn()` para verificar expiración del token. Modificada `checkAuth()` a `async` con auto-refresh cuando el token expiró. Actualizados llamadores en `admin.js` y `vision.js` con `async`/`await`.
+  - **B2-8:** Agregado CSS inline `body { opacity: 0 }` en `<head>` de `dashboard.html` y `admin.html`. Agregada clase `auth-ready` en `checkAuth()` para fade-in suave tras verificación exitosa. Previene FOUC (Flash of Unauthenticated Content).
+  - **B2-9:** Agregado countdown de 120 segundos en `reset-password.html` (igual que `verificacion.html`). Agregadas funciones `startCountdownTimer()` y `updateCountdownDisplay()` en `reset-password.js`. Reinicio automático del countdown tras reenvío. Limpieza de intervalo en `beforeunload`.
+- **Estado:** Completado
+
+## [2026-05-25] - Correcciones Batch 2 — Inconsistencias Frontend/Backend CRÍTICAS
+- **Archivos Modificados:** `Frontend/registro.html`, `Frontend/js/verificacion.js`, `Frontend/js/reset-password.js`, `Frontend/js/admin.js`, `Backend/routes/vision.py` (nuevo), `Backend/routes/__init__.py`, `Backend/app.py`, `Frontend/js/auth.js` (eliminado)
+- **Acción:** Modificado / Creado / Eliminado
+- **Descripción Técnica:**
+  - **B2-1:** Cambiado `result.unique` por `result.valid` en `Frontend/registro.html:433` para coincidir con el campo `valid` que retorna el backend en `validate-document`.
+  - **B2-2:** Cambiado `type: 'register'` por `'verificacion'` en `Frontend/js/verificacion.js:254` y `type: 'reset'` por `'recuperacion'` en `Frontend/js/reset-password.js:297` para coincidir con los tipos que valida el backend en `resend-code`.
+  - **B2-3:** Agregada constante `MOCK_USERS` con 3 usuarios de ejemplo en `Frontend/js/admin.js` (líneas 20-57), usando campos `rol`, `activo`, `nombre_completo` consistentes con las funciones mock existentes.
+  - **B2-4:** Creado `Backend/routes/vision.py` con blueprint `vision_bp` (prefijo `/api/vision`) con endpoints stub `POST /process` y `GET /status/<task_id>`, decoradores `@token_required` y `@limiter.limit('10/minute')`, procesamiento simulado con threading. Registrado en `Backend/routes/__init__.py` y `Backend/app.py`. Agregada sección `vision` en documentación API `GET /api`.
+  - **B2-5:** Eliminado `Frontend/js/auth.js` (duplicado huérfano de `auth2.js`, ninguna página lo cargaba). Actualizado comentario de cabecera en `Frontend/js/admin.js` de "auth.js" a "auth2.js".
+- **Estado:** Completado
+
+## [2026-05-25] - Correcciones de severidad BAJA (Errores 12, 13, 14, 15, 16, 17 y 18)
+- **Archivos Modificados:** `Backend/auth/jwt_handler.py`, `Backend/app.py`, `Backend/routes/auth.py`, `Backend/services/email_service.py`, `Frontend/js/auth.js`, `Frontend/js/auth2.js`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Error 12:** Ampliado docstring del decorador `optional_token` en `jwt_handler.py` documentando su propósito y casos de uso futuros (endpoints públicos con funcionalidad adicional para usuarios autenticados).
+  - **Error 13:** Creada función `start_cleanup_scheduler()` en `jwt_handler.py` usando `threading.Timer` recursivo para ejecutar `cleanup_expired_revoked_tokens()` cada hora. Importado y llamado en `app.py` dentro de `create_app()` después de `init_database()`. Agregados `import threading` e `import logging` con logger para monitoreo.
+  - **Error 14:** Reemplazadas 4 ocurrencias de `datetime.utcnow()` por `datetime.now(timezone.utc)` en `jwt_handler.py` (funciones `generate_token` y `generate_refresh_token`). Agregado `timezone` al import `from datetime import datetime, timedelta, timezone`.
+  - **Error 15:** Movidos todos los imports locales (lazy imports) al nivel superior del módulo en `auth.py`. Consolidados imports de `database.db` (10 funciones) y `services.email_service` (2 funciones). Eliminados 9 bloques de imports dentro de funciones (`register`, `verify_code`, `resend_code`, `forgot_password`, `reset_password`, `validate_document`).
+  - **Error 16:** Agregada validación de formato de email con regex `EMAIL_REGEX` y sanitización/validación de username con `USERNAME_REGEX` (3-20 caracteres alfanuméricos y guion bajo) en `auth.py` endpoint `/api/register`. Agregado `import re`. Agregada función `validateUsername()` en `auth.js` y `auth2.js`.
+  - **Error 17:** Reemplazadas 2 ocurrencias de `© 2024` por `© {datetime.now().year}` en `email_service.py` (templates de verificación y recuperación). Agregado `from datetime import datetime` para año dinámico.
+  - **Error 18:** Agregada validación de carácter especial en contraseñas de `register()` y `reset_password()` en `auth.py` (caracteres `!@#$%^&*()_+-=[]{}|;:,.<>?/`). Agregada condición regex `/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?\/]/` en `validatePassword()` de `auth.js` y `auth2.js`.
+- **Estado:** Completado
+
+## [2026-05-25] - Correcciones de severidad MEDIA (Errores 7, 8, 9, 10 y 11)
+- **Archivos Modificados:** `Backend/app.py`, `Backend/routes/auth.py`, `Backend/routes/admin.py`, `Frontend/js/admin.js`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Error 7:** Agregadas rutas explícitas `/dashboard.html` y `/admin.html` en `app.py`, siguiendo el mismo patrón que las demás páginas HTML. Antes dependían del handler estático de Flask.
+  - **Error 8:** Unificado formato de respuesta de los 7 error handlers globales (400, 401, 403, 404, 405, 429, 500) en `app.py`. Ahora `error` contiene el mensaje descriptivo y se agrega `type` con el tipo HTTP. El frontend puede leer `response.error` consistentemente.
+  - **Error 9:** Creada función helper `_get_json_body()` en `auth.py` y `admin.py` que usa `request.get_json(silent=True)` y lanza `ValueError` si el body es `None`. Reemplazadas las 8 llamadas `request.get_json()` en `auth.py` y 2 en `admin.py` con manejo try/except que retorna 400 con mensaje claro.
+  - **Error 10:** Reemplazadas URLs hardcodeadas `http://localhost:5000` por `request.host_url` dinámico en la documentación API (`GET /api`). Agregadas secciones `admin` (4 endpoints), `system` (health + docs), y páginas `dashboard`/`admin` en `frontend_pages`.
+  - **Error 11:** Cambiado `url_prefix` de `admin_bp` de `/api` a `/api/admin` en `admin.py`. Agregada constante `ADMIN_API_URL = '/api/admin'` en `admin.js` y reemplazadas las 4 llamadas fetch para usar el nuevo prefijo.
+- **Estado:** Completado
+
+## [2026-05-25] - Limpieza de código redundante y muerto (Errores 4, 5 y 6)
+- **Archivos Modificados:** `Backend/app.py`, `Backend/routes/auth.py`
+- **Acción:** Modificado / Eliminado
+- **Descripción Técnica:**
+  - **Error 4:** Eliminadas 5 rutas estáticas redundantes (`/css/`, `/js/`, `/assets/`, `/assets/img/`, `/assets/icons/`) de `app.py`. Flask ya sirve estos archivos automáticamente gracias a `static_folder=FRONTEND_FOLDER` y `static_url_path=''`.
+  - **Error 5:** Consolidado health check en un único endpoint `GET /health` en `app.py`. Corregido timestamp hardcodeado (`'2026-04-20T20:00:00Z'`) por dinámico (`datetime.now(timezone.utc).isoformat()`). Actualizada referencia en documentación API (`GET /health` en vez de `GET /api/health`). Eliminado endpoint duplicado `GET /api/health` de `routes/auth.py`. Verificado que ningún archivo JS/HTML del frontend referencia `/api/health`.
+  - **Error 6:** Eliminada función local muerta `ensure_directories()` de `app.py` (líneas 249-252). La función que realmente se ejecuta es la importada de `database.utils` en la línea 67 dentro de `create_app()`.
+- **Estado:** Completado
+
+## [2026-05-25] - Instalación de dependencias del Backend en el venv
+- **Archivos Modificados:** N/A (instalación de paquetes en `Backend/venv/`)
+- **Acción:** Instalación
+- **Descripción Técnica:** Ejecutado `pip install -r Backend/requirements.txt` usando el Python del venv (`Backend\venv\Scripts\python.exe -m pip`). Paquetes ya instalados: bcrypt, blinker, click, colorama, Flask, flask-cors, itsdangerous, Jinja2, MarkupSafe, numpy, opencv-python, PyJWT, typing_extensions, Werkzeug. Paquetes nuevos instalados: python-dotenv==1.1.0, Flask-Limiter==4.1.1, limits==5.8.0, ordered-set==4.1.0, deprecated==1.3.1, packaging==26.2, wrapt==2.2.1.
+- **Estado:** Completado
+
+## [2026-05-25] - Implementación de Rate Limiting en endpoints de autenticación (Error 3)
+- **Archivos Creados:** `Backend/middleware/__init__.py`, `Backend/middleware/rate_limiter.py`
+- **Archivos Modificados:** `Backend/requirements.txt`, `Backend/app.py`, `Backend/routes/auth.py`, `Frontend/js/auth.js`, `Frontend/js/auth2.js`, `Frontend/js/recuperar.js`, `Frontend/js/verificacion.js`, `Frontend/js/reset-password.js`
+- **Acción:** Añadido / Modificado
+- **Descripción Técnica:**
+  - Agregada dependencia `Flask-Limiter>=3.12` en `requirements.txt`.
+  - Creado paquete `Backend/middleware/` con `__init__.py` y `rate_limiter.py` configurando Flask-Limiter con almacenamiento en memoria, limitación por IP (`get_remote_address`), y manejador personalizado para HTTP 429 que retorna JSON `{"error": "...", "retry_after": <segundos>}`.
+  - Modificado `app.py` para importar e inicializar `limiter.init_app(app)` después de crear la app y antes de registrar blueprints.
+  - Aplicados decoradores de rate limiting en `routes/auth.py`: `/api/login` → 5/min, `/api/register` → 3/hour, `/api/forgot-password` → 3/hour, `/api/resend-code` → 3/hour, `/api/reset-password` → 5/min.
+  - Agregado manejo de HTTP 429 en `auth.js` y `auth2.js` para todas las funciones de API con fetch (login, register, forgotPassword, resendCode, resetPassword), lanzando errores con `isRateLimit=true`.
+  - Agregado manejo específico de rate limiting en `recuperar.js`, `verificacion.js` y `reset-password.js` mostrando toast de advertencia (warning) cuando se detecta `error.isRateLimit`.
+- **Estado:** Completado
+
+## [2026-05-25] - Eliminación de credenciales y secretos hardcodeados (Error 1 + Error 2)
+- **Archivos Modificados:** `Backend/services/email_service.py`, `Backend/auth/jwt_handler.py`, `Backend/app.py`, `Backend/requirements.txt`, `install.bat`, `install.sh`, `start.bat`, `start.sh`
+- **Archivos Creados:** `.env.example`, `.gitignore`
+- **Acción:** Modificado / Añadido
+- **Descripción Técnica:**
+  - Eliminadas credenciales SMTP hardcodeadas en `email_service.py` (EMAIL_FROM y EMAIL_PASSWORD sin valor por defecto, con `EnvironmentError` si faltan).
+  - Eliminado secreto JWT hardcodeado en `jwt_handler.py` (JWT_SECRET_KEY sin valor por defecto, con `EnvironmentError` si falta).
+  - Eliminado SECRET_KEY hardcodeado en `app.py` (sin valor por defecto, con `EnvironmentError` si falta).
+  - Agregado `python-dotenv` con `load_dotenv()` en los 3 archivos Python para carga automática de `.env`.
+  - Agregada dependencia `python-dotenv==1.1.0` en `requirements.txt`.
+  - Creado `.env.example` como plantilla de referencia para los usuarios.
+  - Creado `.gitignore` con `.env`, `__pycache__/`, `*.pyc`, `*.db`, `venv/`, etc.
+  - Modificado `install.bat` con paso interactivo [5/6] que solicita correo SMTP, genera SECRET_KEY y JWT_SECRET_KEY con `secrets.token_hex(32)`, y escribe `.env`.
+  - Modificado `install.sh` con el mismo paso interactivo en bash usando `read -p` y `python3 -c`.
+  - Modificado `start.bat` para verificar existencia de `.env` y cargar variables con `for /f`.
+  - Modificado `start.sh` para verificar existencia de `.env` y cargar variables con `source .env`.
+- **Estado:** Completado
+
+## [2026-05-25] - Plan de corrección de errores de seguridad críticos
+
+- **Archivos Analizados:** `Backend/services/email_service.py`, `Backend/auth/jwt_handler.py`, `Backend/app.py`, `Backend/routes/auth.py`, `Backend/requirements.txt`
+- **Archivo Creado:** `plans/correccion_errores_seguridad.md`
+- **Acción:** Análisis y planificación
+- **Descripción Técnica:** Análisis de 3 errores de seguridad críticos: (1) credenciales SMTP hardcodeadas en email_service.py línea 13, (2) secretos JWT/Flask con valores por defecto visibles en jwt_handler.py línea 15 y app.py línea 39, (3) ausencia de rate limiting en 5 endpoints sensibles de auth.py. Solución actualizada: configuración interactiva en install.bat/install.sh que solicita credenciales por terminal, genera secretos automáticamente con secrets.token_hex(32), y escribe .env. Eliminación de defaults sensibles con EnvironmentError. Flask-Limiter con límites diferenciados por endpoint. 18 archivos a crear/modificar. Nuevas dependencias: python-dotenv, Flask-Limiter.
+- **Estado:** Completado (plan pendiente de aprobación)
+
+## [2026-05-25] - Auditoría completa del sistema de routing (Backend + Frontend)
+
+- **Archivos Analizados:** `Backend/app.py`, `Backend/routes/auth.py`, `Backend/routes/admin.py`, `Backend/auth/jwt_handler.py`, `Backend/services/email_service.py`, `Frontend/index.html`, `Frontend/registro.html`, `Frontend/verificacion.html`, `Frontend/recuperar.html`, `Frontend/reset-password.html`, `Frontend/dashboard.html`, `Frontend/admin.html`, `Frontend/js/auth.js`, `Frontend/js/auth2.js`, `Frontend/js/admin.js`, `Frontend/js/vision.js`, `Frontend/js/verificacion.js`, `Frontend/js/recuperar.js`, `Frontend/js/reset-password.js`
+- **Acción:** Auditoría
+- **Descripción Técnica:** Auditoría exhaustiva de 29 rutas del backend y 21 flujos de navegación del frontend. Se identificaron 33 problemas totales (8 CRÍTICOS, 13 MEDIOS, 12 BAJOS) y 20 optimizaciones propuestas. Hallazgos críticos: credenciales hardcodeadas, sin rate limiting, tipos incorrectos en resend-code, campo validate-document inconsistente, endpoints Vision API inexistentes, MOCK_USERS no definido, auth.js huérfano.
+- **Estado:** Completado
+
+## [2026-05-25] - Estilos Dashboard/Admin + Responsive + PWA
+- **Archivos Modificados:** `Frontend/css/styles.css`, `Frontend/js/admin.js`, `Frontend/index.html`, `Frontend/dashboard.html`, `Frontend/admin.html`, `Frontend/registro.html`, `Frontend/verificacion.html`, `Frontend/recuperar.html`, `Frontend/reset-password.html`
+- **Archivos Creados:** `Frontend/manifest.json`, `Frontend/sw.js`, `Frontend/generate-icons.html`, `Frontend/assets/img/icon-192.png`, `Frontend/assets/img/icon-512.png`
+- **Acción:** Añadido / Modificado
+- **Descripción Técnica:**
+  - **Estilos CSS para Dashboard:**
+    - Agregados estilos completos para `.dashboard-container`, `.navbar`, `.nav-brand`, `.nav-user`, `.btn-logout`
+    - Agregados estilos para `.upload-section`, `.file-input-group`, `.file-label`, `.select-group`
+    - Agregados estilos para `.status-section`, `.progress-bar`, `.progress-fill`
+    - Agregados estilos para `.result-section`, `.result-content`, `.result-info`
+    - Agregado estilo `.btn-primary` reutilizable
+    - Override de `body` con `:has()` para layout full-page en dashboard/admin
+  - **Estilos CSS para Admin:**
+    - Agregados estilos para `.admin-container`, `.admin-content`, `.admin-header`
+    - Agregados estilos para `.users-table-container`, `.users-table` con diseño glassmorphism
+    - Agregados estilos para `.role-badge`, `.status-badge`, `.btn-action`, `.actions-cell`
+    - Agregados estilos para `.no-users`, `.loading-users`, `.admin-actions`
+  - **Responsive Design:**
+    - Agregado breakpoint `@media (max-width: 768px)` para tablets
+    - Agregado breakpoint `@media (max-width: 480px)` mejorado para móviles
+    - Tabla de admin se convierte a cards en móvil con `data-label` (atributos agregados en `admin.js`)
+    - Toasts se adaptan a ancho completo en pantallas pequeñas
+    - Navbar se compacta en móvil (oculta texto de usuario)
+  - **PWA (Progressive Web App):**
+    - Creado `manifest.json` con nombre, iconos, theme-color, display: standalone
+    - Creado `sw.js` (Service Worker) con estrategia Network First + fallback a cache
+    - Generados iconos PWA 192x192 y 512x512 PNG desde Logo.png existente
+    - Creado `generate-icons.html` como herramienta alternativa para generar iconos
+    - Agregados meta tags PWA en los 7 archivos HTML: `theme-color`, `apple-mobile-web-app-capable`, `manifest`, `apple-touch-icon`
+    - Agregado registro de Service Worker en los 7 archivos HTML
+- **Estado:** Completado
+
+## [2026-05-25] - Bug Fix: API_BASE dinámico en vision.js
+- **Archivos Modificados:** `Frontend/js/vision.js`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Problema:** `API_BASE` estaba hardcodeado como `'http://localhost:5000/api/vision'`
+  - Cuando un usuario accede desde otro dispositivo (ej. teléfono vía `http://192.168.x.x:5000`), el módulo de visión fallaba silenciosamente porque apuntaba a `localhost` del dispositivo remoto
+  - **Solución:** Cambiado a `` `${window.location.origin}/api/vision` `` para detectar automáticamente el origen (localhost o IP de red)
+  - Mismo patrón de fix aplicado previamente en `auth.js` el 2026-05-05
+- **Estado:** Completado
+
+## [2026-05-05] - Bug Fix: API_URL dinámico y eliminación de mock
+- **Archivos Modificados:** `Frontend/js/auth.js`
+- **Acción:** Modificado / Eliminado
+- **Descripción Técnica:**
+  - **Problema 1 - API_URL estático:**
+    - El frontend estaba configurado con `API_URL = 'http://localhost:5000/api'`
+    - El usuario accedía desde `http://192.168.0.103:5000` (IP de red)
+    - Las peticiones fallaban porque el navegador bloqueaba peticiones de localhost a IP diferente
+  - **Solución 1 - API_URL dinámico:**
+    - Cambiado a `const API_URL = \`${window.location.origin}/api\``
+    - Ahora detecta automáticamente el origen (localhost o IP) y construye la URL correcta
+  - **Problema 2 - Sistema mock:**
+    - El sistema mock causaba conflictos con el backend real (ver entrada anterior)
+  - **Solución 2 - Eliminación de mock:**
+    - Eliminado completamente el sistema mock (ver entrada anterior)
+  - **Logging agregado:**
+    - En `login()`: logs de datos recibidos, sesión guardada y verificación de `isLoggedIn()`
+- **Estado:** Completado
+
+## [2026-05-05] - Eliminación completa del sistema mock de autenticación
+- **Archivos Modificados:** `Frontend/js/auth.js`
+- **Acción:** Eliminado
+- **Descripción Técnica:**
+  - **Problema:** El sistema mock en [`auth.js`](Frontend/js/auth.js:1) causaba conflictos con el backend real:
+    - Usuarios mock con IDs diferentes (1, 2) vs BD real (10, 11, 12)
+    - Documentos mock diferentes (V10000000) vs BD real (V00000000)
+    - Formato de sesión incompatible: mock `{ token, username, email, rol }` vs backend `{ access_token, refresh_token, user: {...} }`
+    - Tokens mock falsos (`mock-token-1234567890`) no válidos como JWT
+  - **Solución:** Eliminado completamente el sistema mock:
+    - Removidas constantes `MOCK_USERS`, `MOCK_VERIFICATION_CODES`, `MOCK_DOCUMENTS`
+    - Eliminadas todas las funciones mock: `mockLogin()`, `mockRegister()`, `mockVerifyCode()`, `mockResendCode()`, `mockForgotPassword()`, `mockResetPassword()`, `mockValidateDocumentUnique()`
+    - Removidos bloques `catch` que activaban el mock como fallback
+    - Ahora todas las funciones de API (`login()`, `register()`, `verifyCode()`, etc.) solo comunican con el backend real
+  - **Beneficios:**
+    - Elimina confusión entre datos mock y datos reales
+    - Simplifica el código (reducido de 765 a ~400 líneas)
+    - Garantiza que todos los errores del backend se muestren correctamente al usuario
+    - Tokens JWT válidos en todas las sesiones
+- **Estado:** Completado
+
+## [2026-05-05] - Bug Fix: Login usaba mock cuando el backend respondía con error de credenciales
+- **Archivos Modificados:** `Frontend/js/auth.js`, `Frontend/js/admin.js`, `Frontend/index.html`
+- **Acción:** Modificado / Arreglado
+- **Descripción Técnica:**
+  - **Problema diagnosticado:**
+    - Los betatesters reportaban "Backend no disponible, usando mock" al intentar login
+    - El backend SÍ estaba corriendo y respondía con HTTP 401 ("Credenciales inválidas")
+    - El `catch` en `login()` trataba TODOS los errores igual (error de red = error de credenciales)
+    - Cuando el backend rechazaba credenciales, el código caía al mock, que tampoco tenía esos usuarios
+    - Resultado: el usuario no podía iniciar sesión de ninguna forma
+  - **Causa raíz:** La función `login()` no diferenciaba entre:
+    - Error de red (backend realmente caído) → debe usar mock como fallback
+    - Error HTTP 4xx (credenciales inválidas) → debe mostrar error al usuario, NO usar mock
+  - **Solución aplicada en [`auth.js`](Frontend/js/auth.js:128) - función `login()`:**
+    - Ahora detecta si el error es de red (`Failed to fetch`, `NetworkError`, `TypeError`)
+    - Solo usa mock cuando el backend realmente no está disponible
+    - Si el backend responde con error (401, 403, etc.), propaga el error sin usar mock
+  - **Logs de depuración agregados:**
+    - En `login()`: diferenciación clara entre error de red vs error de autenticación
+    - En `checkAuth()`: log de sesión, rol detectado y decisión de redirección
+    - En `admin.js`: log de carga de página y resultado de verificación
+    - En `index.html`: log de resultado de login y URL de redirección
+- **Estado:** Completado
+
+## [2026-05-04] - Documentación: Manual del Betatester y Limpieza de Archivos
+- **Archivos Modificados:** `MANUAL_BETATESTER.md`, eliminados `Backend/test_login.py`, `Backend/test_admin_endpoints.py`, `Backend/test_email.py`, `Backend/init_test_users.py`
+- **Acción:** Añadido / Eliminado
+- **Descripción Técnica:**
+  - **Manual del Betatester ([`MANUAL_BETATESTER.md`](MANUAL_BETATESTER.md:1)):**
+    - Guía completa de instalación para Windows y Linux
+    - 10 planes de prueba detallados cubriendo todas las funcionalidades
+    - Prueba 1: Registro de nuevo usuario
+    - Prueba 2: Verificación de correo con código de 6 dígitos
+    - Prueba 3: Inicio de sesión (login)
+    - Prueba 4: Cierre de sesión (logout)
+    - Prueba 5: Recuperación de contraseña
+    - Prueba 6: Panel de administración (gestión de usuarios)
+    - Prueba 7: Dashboard de visión computacional
+    - Prueba 8: Sesiones y seguridad (tokens, acceso sin login)
+    - Prueba 9: Validaciones de formularios
+    - Prueba 10: Interfaz de usuario (UI/UX)
+    - Diagrama de flujo Mermaid del sistema completo
+    - Plantilla de reporte de bugs
+    - Checklist completo para el betatester
+  - **Limpieza de archivos:**
+    - Eliminados archivos de prueba: `test_login.py`, `test_admin_endpoints.py`, `test_email.py`
+    - Eliminado script de inicialización: `init_test_users.py`
+- **Estado:** Completado
+
+## [2026-05-04] - Instaladores: Creación de Scripts de Instalación y Ejecución
+- **Archivos Modificados:** `install.bat`, `install.sh`, `start.bat`, `start.sh`, `plans/instalador_argos2.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Instalador Windows ([`install.bat`](install.bat:1)):**
+    - Verifica si Python 3.8+ está instalado
+    - Crea entorno virtual en `Backend/venv` si no existe
+    - Verifica si el venv es válido, lo recrea si está corrupto
+    - Activa el entorno virtual
+    - Verifica cada dependencia individualmente (Flask, flask-cors, PyJWT, bcrypt, opencv-python, numpy)
+    - Instala solo las dependencias faltantes desde `requirements.txt`
+    - Crea directorios `uploads/` y `processed/`
+    - Menú interactivo: iniciar ahora, iniciar + navegador, o solo instalar
+  - **Instalador Linux ([`install.sh`](install.sh:1)):**
+    - Verifica si Python3 está instalado
+    - Crea entorno virtual en `Backend/venv` si no existe
+    - Verifica si el venv es válido, lo recrea si está corrupto
+    - Activa el entorno virtual
+    - Verifica cada dependencia individualmente
+    - Instala solo las dependencias faltantes
+    - Crea directorios necesarios
+    - Menú interactivo con soporte para abrir navegador (xdg-open, gnome-open, firefox)
+    - Usa colores en terminal para mejor experiencia visual
+  - **Iniciador Rápido Windows ([`start.bat`](start.bat:1)):**
+    - Verifica si el venv existe
+    - Activa el entorno virtual
+    - Instala dependencias si faltan
+    - Crea directorios necesarios
+    - Inicia la aplicación directamente
+  - **Iniciador Rápido Linux ([`start.sh`](start.sh:1)):**
+    - Verifica si el venv existe
+    - Activa el entorno virtual
+    - Instala dependencias si faltan
+    - Crea directorios necesarios
+    - Inicia la aplicación directamente
+  - **Documentación ([`plans/instalador_argos2.md`](plans/instalador_argos2.md:1)):**
+    - Guía completa de implementación de instaladores
+    - Diagrama de flujo del proceso de instalación
+    - Requisitos previos para Windows y Linux
+    - Instrucciones de uso detalladas
+- **Estado:** Completado
+
+## [2026-05-04] - Frontend: Corrección de Error de Sintaxis - Constantes Duplicadas en admin.js
+- **Archivos Modificados:** `Frontend/js/admin.js`
+- **Acción:** Arreglado
+- **Descripción Técnica:**
+  - **Problema identificado:**
+    - El botón de cerrar sesión no funcionaba en el panel de admin
+    - Error en consola: `Uncaught SyntaxError: Identifier 'API_URL' has already been declared`
+    - Error en consola: `Uncaught SyntaxError: Identifier 'MOCK_USERS' has already been declared`
+    - Ambos archivos `auth.js` y `admin.js` declaraban las mismas constantes globales
+    - Al cargar ambos scripts en `admin.html`, JavaScript lanzaba error de sintaxis
+    - El error impedía que todo el código de `admin.js` se ejecutara, incluyendo el event listener del botón logout
+  - **Solución aplicada:**
+    - Eliminadas las declaraciones duplicadas de `API_URL` y `MOCK_USERS` en `admin.js`
+    - Agregado comentario documentando que `admin.js` depende de `auth.js` y debe cargarse después
+    - Ahora `admin.js` usa las variables definidas en `auth.js`
+  - **Resultado:**
+    - El botón de cerrar sesión funciona correctamente
+    - No hay errores de sintaxis en la consola
+    - El panel de administración carga sin problemas
+- **Estado:** Completado
+
+## [2026-05-04] - Frontend: Implementación de Función Logout - Cierre de Sesión Seguro
+- **Archivos Modificados:** `Frontend/js/auth.js`, `Frontend/js/admin.js`, `Frontend/js/vision.js`, `CHANGELOG.md`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Problema identificado:**
+    - El botón de cerrar sesión solo llamaba a `clearSession()` y redirigía a `index.html`
+    - No se hacía petición al endpoint `/api/logout` del backend
+    - El token JWT seguía siendo válido en el backend, lo cual es un problema de seguridad
+  - **Archivo [`Frontend/js/auth.js`](Frontend/js/auth.js:1) modificado:**
+    - Agregada función [`logout()`](Frontend/js/auth.js:319) que:
+      - Obtiene el token de la sesión (`session.access_token` o `session.token`)
+      - Hace petición POST a `/api/logout` con el token en el header Authorization
+      - Limpia la sesión local independientemente de la respuesta del servidor
+      - Maneja errores gracefully (cierra sesión localmente si hay error)
+      - Retorna mensaje de éxito o error
+    - Agregada función `logout` a la lista de exportaciones del módulo
+  - **Archivo [`Frontend/js/admin.js`](Frontend/js/admin.js:1) modificado:**
+    - Modificado manejador del botón de cerrar sesión (línea537):
+      - Ahora llama a `await logout()` en lugar de solo `clearSession()`
+      - Muestra toast de éxito al cerrar sesión
+      - Maneja errores y cierra sesión localmente de todos modos
+      - Redirige a `index.html` después de cerrar sesión
+  - **Archivo [`Frontend/js/vision.js`](Frontend/js/vision.js:1) modificado:**
+    - Modificado manejador del botón de cerrar sesión (línea365):
+      - Ahora llama a `await logout()` en lugar de solo `clearSession()`
+      - Muestra toast de éxito al cerrar sesión
+      - Maneja errores y cierra sesión localmente de todos modos
+      - Redirige a `index.html` después de cerrar sesión
+  - **Resultado:**
+    - El cierre de sesión ahora es seguro y revoca el token en el backend
+    - El token ya no puede ser usado después de cerrar sesión
+    - Funciona correctamente tanto con backend como con mock
+- **Estado:** Completado
+
+## [2026-05-04] - Frontend: Corrección de Redirección por Rol - Backend vs Mock
+- **Archivos Modificados:** `Frontend/index.html`, `Frontend/js/auth.js`, `Frontend/js/admin.js`, `Frontend/js/vision.js`, `CHANGELOG.md`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Problema identificado:**
+    - El backend retorna el rol dentro del objeto `user` (`result.user.rol`)
+    - El mock retorna el rol directamente (`result.rol`)
+    - El frontend solo verificaba `result.rol`, por lo que siempre redirigía al dashboard de usuario
+  - **Archivo [`Frontend/index.html`](Frontend/index.html:1) modificado:**
+    - Corregida verificación de rol al cargar página (línea72): `const rol = session.user ? session.user.rol : session.rol;`
+    - Corregida verificación de rol después de login (línea114): `const rol = result.user ? result.user.rol : result.rol;`
+    - Ahora funciona correctamente tanto con backend como con mock
+  - **Archivo [`Frontend/js/auth.js`](Frontend/js/auth.js:1) modificado:**
+    - Corregida función [`isAdmin()`](Frontend/js/auth.js:590): `const rol = session.user ? session.user.rol : session.rol;`
+    - Corregida función [`checkAuth()`](Frontend/js/auth.js:601): `const rol = session.user ? session.user.rol : session.rol;`
+    - Ahora verifica correctamente el rol del usuario tanto con backend como con mock
+  - **Archivo [`Frontend/js/admin.js`](Frontend/js/admin.js:1) modificado:**
+    - Corregida función [`getAccessToken()`](Frontend/js/admin.js:480): `return session.access_token || session.token || '';`
+    - Corregida visualización de nombre de admin (línea518): `const userData = session.user || session;`
+    - Ahora obtiene correctamente el token y los datos del usuario
+  - **Archivo [`Frontend/js/vision.js`](Frontend/js/vision.js:1) modificado:**
+    - Corregida función [`getAccessToken()`](Frontend/js/vision.js:109): `return session.access_token || session.token || '';`
+    - Corregida visualización de nombre de usuario (línea280): `const userData = session.user || session;`
+    - Ahora obtiene correctamente el token y los datos del usuario
+  - **Resultado:**
+    - El usuario administrador ahora redirige correctamente al dashboard de administración (`admin.html`)
+    - El usuario regular redirige correctamente al dashboard de usuario (`dashboard.html`)
+    - El sistema funciona correctamente tanto con backend como con mock
+- **Estado:** Completado
+
+## [2026-05-04] - Backend: Endpoints de Administración - Gestión de Usuarios
+- **Archivos Modificados:** `Backend/routes/admin.py`, `Backend/routes/__init__.py`, `Backend/app.py`, `Backend/init_test_users.py`, `Backend/test_login.py`, `Backend/test_admin_endpoints.py`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Backend/routes/admin.py`](Backend/routes/admin.py:1) implementado:**
+    - **Endpoints de administración creados:**
+      - [`GET /api/users`](Backend/routes/admin.py:18) - Lista todos los usuarios (requiere rol admin)
+      - [`PUT /api/users/<user_id>/role`](Backend/routes/admin.py:31) - Cambia el rol de un usuario (requiere rol admin)
+      - [`PUT /api/users/<user_id>/status`](Backend/routes/admin.py:68) - Activa/desactiva un usuario (requiere rol admin)
+      - [`DELETE /api/users/<user_id>`](Backend/routes/admin.py:105) - Elimina un usuario (requiere rol admin)
+    - **Protecciones implementadas:**
+      - No permite cambiar rol del propio admin
+      - No permite desactivar la propia cuenta del admin
+      - No permite eliminar la propia cuenta del admin
+      - Validación de que el usuario existe antes de realizar operaciones
+    - **Decoradores de seguridad:**
+      - `@token_required` - Verifica que el usuario esté autenticado
+      - `@admin_required` - Verifica que el usuario tenga rol de administrador
+  - **Archivo [`Backend/routes/__init__.py`](Backend/routes/__init__.py:1) modificado:**
+    - Agregada importación de `admin_bp`
+    - Agregado `admin_bp` a `__all__`
+  - **Archivo [`Backend/app.py`](Backend/app.py:1) modificado:**
+    - Agregada importación de `admin_bp`
+    - Registrado blueprint `admin_bp` en la aplicación Flask
+  - **Archivo [`Backend/init_test_users.py`](Backend/init_test_users.py:1) creado:**
+    - Script para inicializar usuarios de prueba en la base de datos
+    - Crea usuario administrador (admin@argos.com / Admin123)
+    - Crea usuario de prueba (user@argos.com / Usuario123)
+    - Función para listar todos los usuarios en la base de datos
+    - Configuración de codificación UTF-8 para consola Windows
+  - **Archivo [`Backend/test_login.py`](Backend/test_login.py:1) creado:**
+    - Script para probar el login con usuarios de prueba
+    - Prueba login con administrador
+    - Prueba login con usuario de prueba
+    - Muestra tokens JWT generados
+    - Verifica que el rol se retorne correctamente
+  - **Archivo [`Backend/test_admin_endpoints.py`](Backend/test_admin_endpoints.py:1) creado:**
+    - Script para probar todos los endpoints de administración
+    - Prueba acceso sin token (debe fallar con 401)
+    - Prueba listar usuarios
+    - Prueba cambiar rol de usuario
+    - Prueba activar/desactivar usuario
+    - Verifica que todas las protecciones funcionen correctamente
+  - **Problemas resueltos:**
+    - El dashboard de administrador no funcionaba porque faltaban los endpoints en el backend
+    - El frontend intentaba hacer peticiones a `/api/users`, `/api/users/<id>/role`, `/api/users/<id>/status`, `/api/users/<id>` que no existían
+    - Ahora todos los endpoints están implementados y protegidos con autenticación y autorización
+  - **Resultados de pruebas:**
+    - Login con administrador: EXITOSO
+    - Login con usuario: EXITOSO
+    - Listar usuarios: EXITOSO
+    - Cambiar rol: EXITOSO
+    - Cambiar estado: EXITOSO
+    - Acceso sin token: DENEGADO (correcto)
+- **Estado:** Completado
+
+## [2026-05-04] - Frontend: Dashboard Administrador - Gestión de Usuarios (Paso 7)
+- **Archivos Modificados:** `Frontend/admin.html`, `Frontend/js/admin.js`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Frontend/admin.html`](Frontend/admin.html:1) implementado:**
+    - Estructura HTML con diseño glassmorphism para el panel de administración
+    - **Navbar con:**
+      - Logo de Argos2 y título "Argos2 - Panel de Administración"
+      - Icono escudo.svg para identificar rol de admin
+      - Display del nombre del administrador
+      - Botón de cerrar sesión
+    - **Admin Header:**
+      - Título "Gestión de Usuarios"
+      - Contador de usuarios registrados
+    - **Tabla de Usuarios:**
+      - Columnas: ID, Nombre Completo, Usuario, Email, Fecha Nac., Teléfono, Documento, Rol, Estado, Acciones
+      - Badge de rol (admin/usuario) con colores distintivos
+      - Badge de estado (Activo/Inactivo) con colores distintivos
+      - Botones de acción: Cambiar rol, Activar/Desactivar, Eliminar
+      - Mensaje de "No hay usuarios registrados" cuando la lista está vacía
+      - Indicador de carga "Cargando usuarios..."
+    - **Admin Actions:**
+      - Botón "Actualizar Lista" para recargar la tabla
+    - Integración con módulos toast.js, auth.js y admin.js
+  - **Archivo [`Frontend/js/admin.js`](Frontend/js/admin.js:1) implementado:**
+    - **Funciones de Gestión de Usuarios:**
+      - [`fetchUsers()`](Frontend/js/admin.js:30) - Obtiene lista de todos los usuarios del backend
+      - [`changeUserRole(userId, newRole)`](Frontend/js/admin.js:55) - Cambia rol entre admin/usuario
+      - [`toggleUserStatus(userId, active)`](Frontend/js/admin.js:85) - Activa/desactiva cuenta de usuario
+      - [`deleteUser(userId)`](Frontend/js/admin.js:115) - Elimina un usuario
+    - **Funciones Mock (Fallback):**
+      - [`mockFetchUsers()`](Frontend/js/admin.js:140) - Retorna lista mock de usuarios
+      - [`mockChangeUserRole(userId, newRole)`](Frontend/js/admin.js:148) - Simula cambio de rol
+      - [`mockToggleUserStatus(userId, active)`](Frontend/js/admin.js:175) - Simula cambio de estado
+      - [`mockDeleteUser(userId)`](Frontend/js/admin.js:202) - Simula eliminación de usuario
+    - **Funciones de Renderizado:**
+      - [`renderUsersTable(users)`](Frontend/js/admin.js:238) - Renderiza tabla completa de usuarios
+      - [`renderUserRow(user)`](Frontend/js/admin.js:282) - Renderiza una fila individual de usuario
+    - **Manejadores de Eventos:**
+      - [`handleChangeRole(user)`](Frontend/js/admin.js:335) - Maneja cambio de rol con confirmación
+      - [`handleToggleStatus(user)`](Frontend/js/admin.js:353) - Maneja cambio de estado con confirmación
+      - [`handleDeleteUser(user)`](Frontend/js/admin.js:371) - Maneja eliminación con confirmación
+      - [`loadUsers()`](Frontend/js/admin.js:389) - Carga y renderiza lista de usuarios
+    - **Utilidades:**
+      - [`getAccessToken()`](Frontend/js/admin.js:409) - Obtiene token de la sesión actual
+      - [`confirmAction(message)`](Frontend/js/admin.js:418) - Muestra diálogo de confirmación
+      - [`formatDocument(tipo, numero)`](Frontend/js/admin.js:428) - Formatea documento de identidad
+    - **Inicialización:**
+      - Verifica autenticación y rol de admin con [`checkAuth(true)`](Frontend/js/auth.js:601)
+      - Muestra nombre del administrador en navbar
+      - Carga lista de usuarios al iniciar
+      - Configura evento de botón actualizar lista
+      - Configura evento de botón cerrar sesión
+    - **Protecciones:**
+      - No permite cambiar rol del propio admin
+      - No permite desactivar la propia cuenta del admin
+      - No permite eliminar la propia cuenta del admin
+      - Botones deshabilitados para el usuario actual
+    - **Validaciones:**
+      - Confirmación antes de acciones destructivas
+      - Mensajes de error específicos para cada acción
+      - Toast de notificación para éxito/error
+  - **Comportamiento:**
+    - Verifica sesión activa y rol de admin al cargar
+    - Si no es admin → redirige a dashboard.html con mensaje de error
+    - Muestra tabla con todos los usuarios registrados
+    - Permite cambiar rol entre admin y usuario
+    - Permite activar/desactivar cuentas de usuario
+    - Permite eliminar usuarios (con confirmación)
+    - Actualiza lista automáticamente después de cada acción
+    - Muestra notificaciones toast para todas las acciones
+- **Estado:** Completado
+
+## [2026-05-04] - Frontend: Dashboard Usuario - Visión Computacional (Paso 6)
+- **Archivos Modificados:** `Frontend/dashboard.html`, `Frontend/js/vision.js`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Frontend/dashboard.html`](Frontend/dashboard.html:1) implementado:**
+    - Estructura HTML con diseño glassmorphism para el dashboard de usuario
+    - **Navbar con:**
+      - Logo de Argos2 y título "Argos2 - Visión Computacional"
+      - Display del nombre de usuario
+      - Botón de cerrar sesión
+    - **Welcome Card:**
+      - Mensaje de bienvenida "Bienvenido a Argos2"
+      - Subtítulo "Sistema de Visión Computacional"
+    - **Sección de Upload:**
+      - Input de archivo con label personalizado y icono documento.svg
+      - Display del nombre del archivo seleccionado
+      - Select para tipo de operación: Detección, Clasificación, Mejora de Imagen
+      - Botón "Procesar Imagen"
+    - **Sección de Estado:**
+      - Display del estado de la tarea
+      - Barra de progreso visual
+    - **Sección de Resultado:**
+      - Imagen procesada
+      - Información detallada del resultado
+    - Integración con módulos toast.js, auth.js y vision.js
+  - **Archivo [`Frontend/js/vision.js`](Frontend/js/vision.js:1) implementado:**
+    - **Módulo VISION con:**
+      - `processImage(file, operation)` - Envía imagen al backend para procesamiento
+      - `getTaskStatus(taskId)` - Obtiene el estado de una tarea
+      - `pollTaskStatus(taskId, onProgress, onComplete, onError)` - Polling para actualizar estado
+      - `getAccessToken()` - Obtiene el token de la sesión actual
+    - **Manejo de HTTP 429 - Servidor Saturado:**
+      - Detecta código de respuesta 429
+      - Muestra toast de advertencia con duración extendida (5 segundos)
+      - Mensaje: "El servidor está a máxima capacidad procesando otras imágenes. Intente de nuevo en unos segundos"
+      - Opcional: reintentar automáticamente después de retry_after
+    - **Manejo de HTTP 401 - No autorizado:**
+      - Muestra toast de sesión expirada
+      - Redirige a index.html después de 2 segundos
+    - **Manejo de HTTP 500 - Error del servidor:**
+      - Muestra toast de error genérico
+    - **Funciones de UI:**
+      - `updateTaskStatus(status)` - Actualiza display de estado y barra de progreso
+      - `showResult(status)` - Muestra imagen procesada y detalles
+      - `hideResult()` - Oculta sección de resultados
+      - `resetProgress()` - Reinicia interfaz de progreso
+      - `toggleFormDisabled(disabled)` - Habilita/deshabilita formulario
+    - **Inicialización:**
+      - Verifica autenticación con [`checkAuth()`](Frontend/js/auth.js:601)
+      - Muestra nombre de usuario de la sesión
+      - Manejo del input de archivo con validación de tipo y tamaño (máximo 10MB)
+      - Manejo del formulario de procesamiento
+      - Manejo del botón de cerrar sesión
+    - **Validaciones:**
+      - Validación de tipo de archivo (debe ser imagen)
+      - Validación de tamaño de archivo (máximo 10MB)
+      - Validación de archivo seleccionado antes de procesar
+    - **Polling de estado:**
+      - Intervalo de 2 segundos entre consultas
+      - Máximo 60 intentos (2 minutos de espera)
+      - Estados: PENDING, PROCESSING, COMPLETED, FAILED
+      - Callbacks para progreso, completado y error
+  - **Comportamiento:**
+    - Verifica sesión activa al cargar, redirige a login si no hay sesión
+    - Muestra nombre de usuario en navbar
+    - Permite seleccionar imagen y tipo de operación
+    - Envía imagen al backend con token de autenticación
+    - Muestra progreso en tiempo real con polling
+    - Muestra resultado al completar procesamiento
+    - Maneja servidor saturado (HTTP 429) con mensaje informativo
+    - Cierra sesión y redirige a login al hacer clic en cerrar sesión
+- **Estado:** Completado
+
+## [2026-04-26] - Frontend: Refactorización de Estructura de Inputs con .input-wrapper
+- **Archivos Modificados:** `Frontend/registro.html`, `Frontend/index.html`, `Frontend/recuperar.html`, `Frontend/reset-password.html`, `Frontend/css/styles.css`, `CHANGELOG.md`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Problema resuelto:**
+    - Los iconos de los campos se salían de las cajas de texto (inputs)
+    - La clase `.input-group` usaba `display: flex; flex-direction: column;` y contenía label, icono e input
+    - Al aplicarle `top: 50%` al `.input-icon`, el navegador calculaba el 50% de la altura total (incluyendo el label)
+    - Esto causaba que el icono quedara desalineado y fuera del input
+  - **Solución implementada:**
+    - **Estructura HTML refactorizada:**
+      - Nuevo elemento `.input-wrapper` que envuelve al `.input-icon` y al `<input>`
+      - El `<label>` ahora queda por fuera del wrapper
+      - Estructura nueva: `.input-group` → `label` + `.input-wrapper` → `.input-icon` + `input`
+    - **Archivos HTML actualizados:**
+      - [`Frontend/registro.html`](Frontend/registro.html:260) - 8 campos actualizados (nombre, fecha, teléfono, documento, email, usuario, password, confirm-password)
+      - [`Frontend/index.html`](Frontend/index.html:20) - 2 campos actualizados (username, password)
+      - [`Frontend/recuperar.html`](Frontend/recuperar.html:19) - 1 campo actualizado (email)
+      - [`Frontend/reset-password.html`](Frontend/reset-password.html:28) - 2 campos actualizados (new-password, confirm-password)
+    - **CSS actualizado en [`Frontend/css/styles.css`](Frontend/css/styles.css:126):**
+      - **`.input-group`** - Contenedor principal con `position: relative; display: flex; flex-direction: column; gap: 8px;`
+      - **`.input-wrapper`** - Nuevo contenedor con `position: relative; width: 100%;`
+      - **`.input-wrapper .input-icon`** - Posicionamiento absoluto relativo al wrapper:
+        - `position: absolute; left: 18px; top: 50%; transform: translateY(-50%);`
+        - Ahora el `top: 50%` se calcula solo sobre la altura del wrapper (no incluye el label)
+        - El `transform: translateY(-50%)` centra verticalmente el icono perfectamente
+      - **`.input-wrapper input`** - Estilos del input con `padding-left: 50px;` para espacio para el icono
+      - **Regla para ocultar icono de calendario nativo:**
+        - `.input-wrapper input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-appearance: none; }`
+      - **Reglas de validación actualizadas:**
+        - `.input-wrapper input.valid` - Borde verde para campos válidos
+        - `.input-wrapper input.invalid` - Borde rojo para campos inválidos
+      - **Reglas para `.document-row` actualizadas:**
+        - `.document-row .input-wrapper input { padding-left: 45px; }`
+        - `.document-row .input-wrapper .input-icon { left: 15px; }`
+    - **Limpieza de CSS:**
+      - Eliminadas reglas duplicadas de `.input-group` (líneas 193-257)
+      - Eliminadas reglas obsoletas que apuntaban a `.input-group .input-icon` y `.input-group input`
+      - Ahora todas las reglas apuntan a `.input-wrapper` para mayor claridad y mantenimiento
+  - **Beneficios:**
+    - Los iconos ahora se centran perfectamente dentro de los inputs
+    - Estructura HTML más semántica y mantenible
+    - CSS más limpio sin reglas duplicadas
+    - El icono de calendario nativo no choca con el icono personalizado
+    - Solución consistente en todas las páginas del frontend
+- **Estado:** Completado
+
+## [2026-04-26] - Frontend: Corrección de Estilos de Iconos SVG
+- **Archivos Modificados:** `Frontend/css/styles.css`, `CHANGELOG.md`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Archivo [`Frontend/css/styles.css`](Frontend/css/styles.css:1) modificado:**
+    - Corrección de estilos para iconos SVG en todas las páginas
+    - **Estilos para `.input-icon`:**
+      - Agregado `display: flex`, `align-items: center`, `justify-content: center`
+      - Estilos para `img` y `svg` dentro de `.input-icon` con `width: 100%`, `height: 100%`, `display: block`, `object-fit: contain`
+    - **Estilos para `.login-header .icon`:**
+      - Agregado `display: flex`, `align-items: center`, `justify-content: center`
+      - Estilos para `img` y `svg` dentro de `.login-header .icon`
+    - **Estilos para `.registro-header .icon`:**
+      - Agregado `display: flex`, `align-items: center`, `justify-content: center`
+      - Estilos para `img` y `svg` dentro de `.registro-header .icon`
+    - **Estilos para `.verificacion-header .icon-large`:**
+      - Agregado `display: flex`, `align-items: center`, `justify-content: center`
+      - Estilos para `img` y `svg` dentro de `.verificacion-header .icon-large`
+    - **Estilos para `.recuperar-header .icon-large`:**
+      - Agregado `display: flex`, `align-items: center`, `justify-content: center`
+      - Estilos para `img` y `svg` dentro de `.recuperar-header .icon-large`
+    - **Estilos para `.reset-header .icon-large`:**
+      - Agregado `display: flex`, `align-items: center`, `justify-content: center`
+      - Estilos para `img` y `svg` dentro de `.reset-header .icon-large`
+    - **Estilos para `.login-header .logo`:**
+      - Agregado `display: block`
+    - **Estilos para `.registro-header .logo`:**
+      - Agregado `display: block`
+  - **Problema resuelto:**
+    - Los iconos SVG se salían de sus cajas en todas las páginas
+    - Ahora los iconos se mantienen dentro de sus contenedores con las dimensiones correctas
+    - Los iconos se centran correctamente y no desbordan sus cajas
+- **Estado:** Completado
+
+## [2026-04-26] - Backend: Servidor de Archivos Estáticos del Frontend
+- **Archivos Modificados:** `Backend/app.py`, `CHANGELOG.md`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Archivo [`Backend/app.py`](Backend/app.py:1) modificado:**
+    - Configuración de Flask para servir archivos estáticos del frontend
+    - Definición de `FRONTEND_FOLDER` apuntando a `../Frontend`
+    - Configuración de `static_folder` y `static_url_path` para servir archivos estáticos
+    - Configuración de `template_folder` para servir archivos HTML
+  - **Rutas del Frontend implementadas:**
+    - `GET /` - Redirige a index.html (Login)
+    - `GET /index.html` - Página de Login
+    - `GET /registro.html` - Página de Registro
+    - `GET /verificacion.html` - Página de Verificación de Correo
+    - `GET /recuperar.html` - Página de Recuperación de Contraseña
+    - `GET /reset-password.html` - Página de Reset de Contraseña
+  - **Rutas de Archivos Estáticos implementadas:**
+    - `GET /css/<filename>` - Servir archivos CSS
+    - `GET /js/<filename>` - Servir archivos JavaScript
+    - `GET /assets/<filename>` - Servir archivos de assets
+    - `GET /assets/img/<filename>` - Servir imágenes (Logo.png, fondo.jfif)
+    - `GET /assets/icons/<filename>` - Servir iconos SVG
+  - **Ruta de API Documentación:**
+    - `GET /api` - Documentación de la API en formato JSON
+  - **Beneficios:**
+    - El backend ahora sirve todas las páginas del frontend
+    - No es necesario usar Live Server de VS Code
+    - Todas las imágenes, CSS y JS se sirven correctamente
+    - La aplicación completa se ejecuta en un solo servidor (Flask en puerto 5000)
+    - URLs actualizadas para apuntar a http://localhost:5000
+- **Estado:** Completado
+
+## [2026-04-25] - Backend: Documentación Completa de Rutas y Endpoints
+- **Archivos Modificados:** `Backend/routes/__init__.py`, `Backend/app.py`, `CHANGELOG.md`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - **Archivo [`Backend/routes/__init__.py`](Backend/routes/__init__.py:1) modificado:**
+    - Documentación completa de todas las rutas del frontend
+    - Documentación completa de todos los endpoints del backend
+    - Organización por categorías: Autenticación, Registro y Verificación, Recuperación de Contraseña, Validación
+    - Descripción detallada de cada endpoint con método, parámetros y respuesta
+  - **Archivo [`Backend/app.py`](Backend/app.py:1) modificado:**
+    - Actualización del endpoint raíz `/` con documentación completa de la API
+    - Inclusión de URLs del frontend (http://localhost:5500)
+    - Inclusión de URLs del backend (http://localhost:5000)
+    - Listado de todas las páginas del frontend:
+      - index.html - Página de Login
+      - registro.html - Página de Registro
+      - verificacion.html - Página de Verificación de Correo
+      - recuperar.html - Página de Recuperación de Contraseña
+      - reset-password.html - Página de Reset de Contraseña
+    - Documentación detallada de cada endpoint:
+      - login: Iniciar sesión
+      - register: Registrar nuevo usuario
+      - verify_code: Verificar código de correo
+      - resend_code: Reenviar código
+      - forgot_password: Iniciar recuperación
+      - reset_password: Restablecer contraseña
+      - validate_document: Validar documento
+      - logout: Cerrar sesión
+      - refresh: Renovar token
+      - me: Obtener usuario actual
+    - Para cada endpoint se incluye: método, ruta, descripción, body/headers y respuesta esperada
+  - **Beneficios:**
+    - Documentación centralizada en un solo lugar
+    - Fácil referencia para desarrolladores
+    - Información completa para integración frontend-backend
+    - Documentación accesible via GET /
+- **Estado:** Completado
+
+## [2026-04-25] - Backend: Servicio de Email Automatizado
+- **Archivos Modificados:** `Backend/services/email_service.py`, `Backend/services/__init__.py`, `Backend/routes/auth.py`, `Backend/test_email.py`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Backend/services/email_service.py`](Backend/services/email_service.py:1) creado:**
+    - Servicio de email automatizado usando Gmail SMTP
+    - Configuración con credenciales proporcionadas (sqprpject@gmail.com)
+    - Función `enviar_correo_verificacion()` para enviar códigos de verificación de registro
+    - Función `enviar_correo_recuperacion()` para enviar códigos de recuperación de contraseña
+    - Plantillas HTML con diseño glassmorphism acorde al tema de Argos2
+    - Manejo de errores con retorno de tupla (exitoso, mensaje)
+    - Soporte para variables de entorno para configuración
+  - **Archivo [`Backend/services/__init__.py`](Backend/services/__init__.py:1) creado:**
+    - Paquete Python para el módulo de servicios
+    - Exportación de funciones de email_service
+  - **Archivo [`Backend/routes/auth.py`](Backend/routes/auth.py:1) modificado:**
+    - **Endpoint `POST /api/register` modificado:**
+      - Integración con `enviar_correo_verificacion()`
+      - Envío automático de código de verificación por email
+      - Fallback a consola en caso de error de envío
+    - **Endpoint `POST /api/resend-code` modificado:**
+      - Integración con `enviar_correo_verificacion()` y `enviar_correo_recuperacion()`
+      - Envío automático de nuevo código según tipo
+      - Fallback a consola en caso de error de envío
+    - **Endpoint `POST /api/forgot-password` modificado:**
+      - Integración con `enviar_correo_recuperacion()`
+      - Envío automático de código de recuperación por email
+      - Fallback a consola en caso de error de envío
+  - **Archivo [`Backend/test_email.py`](Backend/test_email.py:1) creado:**
+    - Script de prueba para el servicio de email
+    - Pruebas de envío de correo de verificación
+    - Pruebas de envío de correo de recuperación
+    - Resumen de resultados de pruebas
+  - **Pruebas realizadas:**
+    - Envío de correo de verificación: EXITOSO
+    - Envío de correo de recuperación: EXITOSO
+  - **Características de los correos:**
+    - Diseño HTML con glassmorphism
+    - Colores acordes al tema de Argos2 (#6A1B9A, #8E24AA)
+    - Código destacado con gradiente morado
+    - Información de expiración (2 minutos)
+    - Advertencias de seguridad
+    - Footer con copyright de Argos2
+- **Estado:** Completado
+
+## [2026-04-24] - Backend: Integración de Endpoints de Autenticación Frontend
+- **Archivos Modificados:** `Backend/routes/auth.py`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Backend/routes/auth.py`](Backend/routes/auth.py:1) modificado:**
+    - **Endpoint `POST /api/register` implementado:**
+      - Validación de campos requeridos (username, email, password, nombre_completo, fecha_nacimiento, tipo_documento, numero_documento)
+      - Validación de tipo de documento (V o P)
+      - Validación de formato de documento (V: 7-8 dígitos, P: 6-12 caracteres)
+      - Validación de contraseña (8+ caracteres, mayúscula, minúscula, número)
+      - Validación de unicidad de email, username y documento
+      - Hash de contraseña con bcrypt
+      - Creación de usuario en base de datos
+      - Generación de código de verificación de 6 dígitos (válido por 2 minutos)
+      - Respuesta con mensaje de éxito y email
+    - **Endpoint `POST /api/verify-code` implementado:**
+      - Validación de email y código
+      - Verificación de código en base de datos
+      - Validación de expiración del código
+      - Marcado de email como verificado
+      - Respuesta con mensaje de éxito
+    - **Endpoint `POST /api/resend-code` implementado:**
+      - Validación de email y tipo de código ('verificacion' o 'recuperacion')
+      - Verificación de email existente para verificación
+      - Verificación de email no verificado para reenvío
+      - Generación de nuevo código de 6 dígitos
+      - Respuesta con mensaje de éxito
+    - **Endpoint `POST /api/forgot-password` implementado:**
+      - Validación de email
+      - Verificación de email en base de datos
+      - Generación de código de recuperación de 6 dígitos (válido por 2 minutos)
+      - Respuesta genérica por seguridad (no revela si email existe)
+    - **Endpoint `POST /api/reset-password` implementado:**
+      - Validación de email, código y nueva contraseña
+      - Validación de requisitos de contraseña
+      - Verificación de código de recuperación
+      - Actualización de contraseña con hash bcrypt
+      - Respuesta con mensaje de éxito
+    - **Endpoint `POST /api/validate-document` implementado:**
+      - Validación de tipo y número de documento
+      - Verificación de unicidad en base de datos
+      - Respuesta con valid y mensaje
+  - **Integración Frontend-Backend:**
+    - Todos los endpoints necesarios para el frontend están ahora implementados
+    - El frontend puede ahora comunicarse con el backend para:
+      - Registro de usuarios
+      - Verificación de correo electrónico
+      - Reenvío de códigos de verificación
+      - Recuperación de contraseña
+      - Reset de contraseña
+      - Validación de documentos en tiempo real
+    - Los códigos de verificación se muestran en consola para desarrollo
+    - En producción, se debe implementar el envío de emails
+- **Estado:** Completado
+
+## [2026-04-24] - Frontend: Pantalla de Reset de Contraseña - Parte 5
+- **Archivos Modificados:** `Frontend/reset-password.html`, `Frontend/css/styles.css`, `Frontend/js/reset-password.js`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Frontend/reset-password.html`](Frontend/reset-password.html:1) implementado:**
+    - Estructura HTML con diseño glassmorphism
+    - Header con icono candado.svg y título "Nueva Contraseña"
+    - Texto informativo sobre el proceso de reset
+    - **Formulario de reset:**
+      - 6 inputs separados para código de verificación (un dígito cada uno)
+      - Input de nueva contraseña con icono llave.svg
+      - Input de confirmación de contraseña
+      - Botón "CAMBIAR CONTRASEÑA" deshabilitado hasta completar código
+    - Link para reenviar código
+    - Link para volver al login
+    - Integración con módulos toast.js, auth.js y reset-password.js
+  - **Archivo [`Frontend/css/styles.css`](Frontend/css/styles.css:932) modificado:**
+    - **Estilos para reset de contraseña:**
+      - `.reset-container` - Contenedor centrado con glassmorphism
+      - `.reset-header` - Header con icono y título
+      - `.icon-large` - Icono de 50px para candado.svg
+      - `.info-text` - Texto informativo con color secundario
+      - **`#reset-form`** - Formulario con gap de 20px
+      - **`#btn-cambiar`** - Botón de cambio con:
+        - Hover con escala y sombra morada
+        - Estado disabled con cursor not-allowed
+      - Reutiliza estilos de `.code-input-group` y `.code-digit` de verificación
+      - Reutiliza estilos de `.resend-section` de verificación
+    - **Responsive:**
+      - Ajustes para móviles (inputs más pequeños, fuentes reducidas)
+  - **Archivo [`Frontend/js/reset-password.js`](Frontend/js/reset-password.js:1) implementado:**
+    - **Inicialización:**
+      - Obtener email de query params (`?email=...`)
+      - Validar que se proporcionó email, redirigir si no
+      - Inicializar inputs de código, configurar eventos
+      - Configurar validación de contraseña en tiempo real
+    - **Manejo de inputs de código (reutilizado):**
+      - Auto-focus al siguiente input al escribir un dígito
+      - Solo permitir números (regex `/^\d*$/`)
+      - Navegación con teclas (Backspace, ArrowLeft, ArrowRight)
+      - Soporte para pegar código completo (Ctrl+V o paste event)
+      - Validación de código completo para habilitar botón
+    - **Validación de contraseña:**
+      - Función `validateNewPassword()` que usa [`validatePassword()`](Frontend/js/auth.js:60) de auth.js
+      - Valida requisitos: 8+ caracteres, mayúscula, minúscula, número
+      - Función `validatePasswordMatch()` que verifica coincidencia
+      - Validación en tiempo real (blur y input)
+      - Clases CSS `.valid` e `.invalid` para feedback visual
+    - **Manejo de reset:**
+      - Función `handleResetPassword()` que:
+        - Valida código de 6 dígitos
+        - Valida requisitos de nueva contraseña
+        - Valida que las contraseñas coincidan
+        - Llama a [`resetPassword(email, code, newPassword)`](Frontend/js/auth.js:269) de auth.js
+        - Muestra toast de éxito/error
+        - Redirige a `index.html?reset=true` tras éxito
+        - Marca inputs como inválidos con animación shake al error
+        - Limpia inputs de código tras error
+    - **Reenvío de código:**
+      - Función `handleResendCode()` que:
+        - Llama a [`resendCode(email, 'reset')`](Frontend/js/auth.js:213) de auth.js
+        - Muestra toast de resultado
+        - Limpia inputs de código y enfoca el primero
+  - **Comportamiento:**
+    - Código de 6 dígitos con navegación fluida entre inputs
+    - Soporte para pegar código completo desde clipboard
+    - Validación de contraseña con requisitos de complejidad
+    - Validación de coincidencia de contraseñas
+    - Redirección a login tras reset exitoso
+- **Estado:** Completado
+
+## [2026-04-24] - Frontend: Pantalla de Recuperar Contraseña - Parte 4
+- **Archivos Modificados:** `Frontend/recuperar.html`, `Frontend/css/styles.css`, `Frontend/js/recuperar.js`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Frontend/recuperar.html`](Frontend/recuperar.html:1) implementado:**
+    - Estructura HTML con diseño glassmorphism
+    - Header con icono candado.svg y título "Recuperar Contraseña"
+    - Texto informativo sobre el proceso de recuperación
+    - **Formulario de recuperación:**
+      - Input de correo electrónico con icono sobre.svg
+      - Validación HTML5 de tipo email
+      - Botón "ENVIAR CÓDIGO" para solicitar recuperación
+    - Link para volver al login
+    - Integración con módulos toast.js, auth.js y recuperar.js
+  - **Archivo [`Frontend/css/styles.css`](Frontend/css/styles.css:800) modificado:**
+    - **Estilos para recuperar contraseña:**
+      - `.recuperar-container` - Contenedor centrado con glassmorphism
+      - `.recuperar-header` - Header con icono y título
+      - `.icon-large` - Icono de 50px para candado.svg
+      - `.info-text` - Texto informativo con color secundario y line-height 1.6
+      - **`#recuperar-form`** - Formulario con gap de 20px
+      - **`#btn-enviar`** - Botón de envío con:
+        - Hover con escala y sombra morada
+        - Estado disabled con cursor not-allowed
+    - **Responsive:**
+      - Ajustes para móviles (iconos más pequeños, fuentes reducidas)
+  - **Archivo [`Frontend/js/recuperar.js`](Frontend/js/recuperar.js:1) implementado:**
+    - **Inicialización:**
+      - Configurar evento submit del formulario
+      - Configurar validación de email en tiempo real (blur y input)
+    - **Validación de email:**
+      - Función `validateEmailInput()` que valida al perder foco
+      - Función `clearEmailValidation()` que limpia estados al escribir
+      - Usa [`validateEmail()`](Frontend/js/auth.js:113) de auth.js
+      - Muestra toast de advertencia si el email es inválido
+      - Clases CSS `.valid` e `.invalid` para feedback visual
+    - **Manejo de recuperación:**
+      - Función `handleForgotPassword()` que:
+        - Valida que el campo email no esté vacío
+        - Valida formato de email
+        - Deshabilita botón durante procesamiento
+        - Llama a [`forgotPassword(email)`](Frontend/js/auth.js:240) de auth.js
+        - Muestra toast de éxito/error
+        - Redirige a `reset-password.html?email=...` tras éxito
+        - Rehabilita botón tras error
+  - **Comportamiento:**
+    - Validación de email en tiempo real con feedback visual
+    - Mensaje genérico de éxito por seguridad (no revela si email existe)
+    - Redirección a reset-password.html con email en query params
+    - Botón deshabilitado durante procesamiento
+- **Estado:** Completado
+
+## [2026-04-23] - Frontend: Pantalla de Verificación de Correo - Parte 3
+- **Archivos Modificados:** `Frontend/verificacion.html`, `Frontend/css/styles.css`, `Frontend/js/verificacion.js`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Frontend/verificacion.html`](Frontend/verificacion.html:1) implementado:**
+    - Estructura HTML con diseño glassmorphism
+    - Header con icono sobre.svg y título "Verificación de Correo"
+    - Display del email del usuario (obtenido de query params)
+    - Información de expiración del código (2 minutos)
+    - **Formulario de verificación:**
+      - 6 inputs separados para código de verificación (un dígito cada uno)
+      - Input numérico con maxlength="1" y auto-focus al siguiente
+      - Botón VERIFICAR deshabilitado hasta completar código
+    - **Sección de reenvío:**
+      - Countdown de 120 segundos antes de permitir reenvío
+      - Link "Reenviar código" que aparece después del countdown
+    - Link para volver al login
+    - Integración con módulos toast.js, auth.js y verificacion.js
+  - **Archivo [`Frontend/css/styles.css`](Frontend/css/styles.css:652) modificado:**
+    - **Estilos para verificación:**
+      - `.verificacion-container` - Contenedor centrado con glassmorphism
+      - `.verificacion-header` - Header con icono y título
+      - `.icon-large` - Icono de 50px para sobre.svg
+      - `.info-text` - Texto informativo con color secundario
+      - `.email-display` - Display del email con color primario
+      - `.expiry-info` - Información de expiración con color warning
+      - **`.code-input-group`** - Contenedor de los 6 inputs de código
+      - **`.code-digit`** - Inputs individuales con:
+        - Tamaño 50x60px, fuente 24px, centrados
+        - Bordes redondeados, efecto glassmorphism
+        - Focus con borde morado y sombra
+        - Estados `.valid` (verde) y `.invalid` (rojo con animación shake)
+        - Animación `@keyframes shake` para error
+      - **`#btn-verificar`** - Botón de verificación con:
+        - Hover con escala y sombra morada
+        - Estado disabled con cursor not-allowed
+      - **`.resend-section`** - Sección de reenvío con:
+        - Countdown en color secundario
+        - Link con color primario y hover underline
+    - **Responsive:**
+      - Ajustes para móviles (inputs más pequeños, fuentes reducidas)
+  - **Archivo [`Frontend/js/verificacion.js`](Frontend/js/verificacion.js:1) implementado:**
+    - **Inicialización:**
+      - Obtener email de query params (`?email=...`)
+      - Validar que se proporcionó email, redirigir si no
+      - Mostrar email en la página
+      - Inicializar inputs de código, iniciar countdown, configurar eventos
+    - **Manejo de inputs de código:**
+      - Auto-focus al siguiente input al escribir un dígito
+      - Solo permitir números (regex `/^\d*$/`)
+      - Navegación con teclas (Backspace, ArrowLeft, ArrowRight)
+      - Soporte para pegar código completo (Ctrl+V o paste event)
+      - Validación de código completo para habilitar botón
+    - **Verificación:**
+      - Función `handleVerification()` que:
+        - Obtiene código completo de los 6 inputs
+        - Llama a `verifyCode(email, code)` de auth.js
+        - Muestra toast de éxito/error
+        - Redirige a `index.html?verified=true` tras éxito
+        - Marca inputs como inválidos con animación shake al error
+        - Limpia inputs tras error
+    - **Countdown Timer:**
+      - Función `startCountdownTimer()` con 120 segundos
+      - Muestra formato "Reenviar código en 2:00"
+      - Oculta countdown y muestra link al finalizar
+      - Reinicia countdown tras reenvío exitoso
+    - **Reenvío de código:**
+      - Función `handleResendCode()` que:
+        - Llama a `resendCode(email, 'register')` de auth.js
+        - Muestra toast de resultado
+        - Reinicia countdown
+        - Limpia inputs y enfoca el primero
+    - **Limpieza:**
+      - Evento `beforeunload` para limpiar intervalo de countdown
+  - **Comportamiento:**
+    - Código de 6 dígitos con navegación fluida entre inputs
+    - Soporte para pegar código completo desde clipboard
+    - Countdown de 2 minutos antes de permitir reenvío
+    - Validación con feedback visual (toast + animación shake)
+    - Redirección a login tras verificación exitosa
+- **Estado:** Completado
+
+## [2026-04-23] - Frontend: Pantalla de Registro - Parte 2
+- **Archivos Modificados:** `Frontend/registro.html`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Archivo [`Frontend/registro.html`](Frontend/registro.html:1) implementado:**
+    - Estructura HTML con diseño glassmorphism y scrollable para contenido extenso
+    - **Sección Datos Personales:**
+      - Nombre Completo (requerido)
+      - Fecha de Nacimiento con validación (18-100 años)
+      - Teléfono (opcional) con validación de formato venezolano
+      - Documento de Identidad con select tipo (V/P) y validación de unicidad
+    - **Sección Datos de Cuenta:**
+      - Correo electrónico con validación de formato
+      - Nombre de usuario
+      - Contraseña con validación de complejidad (8+ caracteres, mayúscula, minúscula, número)
+      - Confirmación de contraseña con verificación de coincidencia
+    - **Validaciones en tiempo real:**
+      - Validación de documento único al perder foco
+      - Validación de teléfono, email y contraseña con feedback visual
+      - Indicadores visuales (verde/rojo) para campos válidos/inválidos
+      - Mensajes de validación específicos para cada campo
+    - **Estilos CSS integrados:**
+      - Contenedor scrollable con scrollbar personalizado
+      - Diseño responsive para móviles
+      - Estados de validación (valid/invalid) con bordes de color
+      - Animaciones y transiciones suaves
+    - **Comportamiento:**
+      - Redirección a `verificacion.html?email=...` tras registro exitoso
+      - Integración con módulos toast.js y auth.js
+      - Botón deshabilitado durante procesamiento
+- **Estado:** Completado
+
+## [2026-04-23] - Frontend: Pantalla de Login - Parte 1
+- **Archivos Modificados:** `Frontend/index.html`, `Frontend/css/styles.css`, `Frontend/js/toast.js`, `Frontend/js/auth.js`, `Frontend/assets/icons/monitor.svg`, `Frontend/assets/icons/usuario.svg`, `Frontend/assets/icons/llave.svg`, `Frontend/assets/icons/sobre.svg`, `Frontend/assets/icons/escudo.svg`, `Frontend/assets/icons/check.svg`, `Frontend/assets/icons/candado.svg`, `Frontend/assets/icons/telefono.svg`, `Frontend/assets/icons/documento.svg`, `Frontend/assets/icons/calendario.svg`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Estructura de carpetas creada:**
+    - `Frontend/css/` - Estilos globales
+    - `Frontend/js/` - Módulos JavaScript
+    - `Frontend/assets/img/` - Imágenes (fondo.jfif, Logo.png)
+    - `Frontend/assets/icons/` - Iconos SVG
+  - **Archivo [`Frontend/index.html`](Frontend/index.html:1) implementado:**
+    - Estructura HTML con diseño glassmorphism
+    - Formulario de login con campos usuario y contraseña
+    - Botones REGISTRAR (redirige a registro.html) e INGRESAR
+    - Link para recuperación de contraseña
+    - Integración con módulos toast.js y auth.js
+    - Redirección automática según rol (admin → admin.html, usuario → dashboard.html)
+  - **Archivo [`Frontend/css/styles.css`](Frontend/css/styles.css:1) implementado:**
+    - Variables CSS con paleta de colores cyber/industrial dark mode
+    - Estilos glassmorphism con backdrop-filter
+    - Componentes: input-group, button-group, message, toast
+    - Sistema de notificaciones toast con animaciones
+    - Diseño responsive para móviles
+  - **Archivo [`Frontend/js/toast.js`](Frontend/js/toast.js:1) implementado:**
+    - Función `showToast(message, type, duration)`
+    - Tipos: success, error, warning, info
+    - Contenedor dinámico inyectado en el DOM
+    - Animaciones slideIn y fadeOut
+  - **Archivo [`Frontend/js/auth.js`](Frontend/js/auth.js:1) implementado:**
+    - Funciones de API: login, register, verifyCode, resendCode, forgotPassword, resetPassword, validateDocumentUnique
+    - Funciones mock para fallback cuando el backend no responde
+    - Validaciones: password, phone, document, email
+    - Gestión de sesión: saveSession, getSession, clearSession, isLoggedIn, isAdmin, checkAuth
+    - Utilidades: showMessage, validateFields, formatDocument, startCountdown
+  - **Iconos SVG creados:**
+    - monitor.svg, usuario.svg, llave.svg, sobre.svg, escudo.svg, check.svg, candado.svg, telefono.svg, documento.svg, calendario.svg
+- **Estado:** Completado
+
+## [2026-04-23] - Fase 3: Middleware de Autenticación con PyJWT - Pruebas Completas (6/6 PASARON)
+- **Archivos Modificados:** `Backend/test_fase3_completo.py`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - Creado script de pruebas automatizadas [`test_fase3_completo.py`](Backend/test_fase3_completo.py)
+  - **Prueba 1: Importación de Módulos** - PASÓ
+    - auth.jwt_handler importado correctamente
+    - routes.auth importado correctamente
+    - app Flask importado correctamente
+    - database.db importado correctamente
+  - **Prueba 2: Generación de Tokens JWT** - PASÓ
+    - Access token generado con jti único y versión
+    - Refresh token generado con tipo 'refresh'
+    - Access token decodificado correctamente (payload válido)
+    - Refresh token decodificado correctamente
+  - **Prueba 3: Blacklist de Tokens** - PASÓ
+    - Token no está en blacklist inicialmente (correcto)
+    - Token agregado a blacklist exitosamente
+    - Token verificado en blacklist (correcto)
+    - Token revocado rechazado correctamente (código: TOKEN_REVOKED)
+    - Revocación masiva ejecutada (versión incrementada)
+    - Tokens expirados limpiados
+  - **Prueba 4: Aplicación Flask** - PASÓ
+    - Aplicación Flask creada correctamente
+    - Blueprint 'auth' registrado
+    - Todas las rutas de autenticación registradas: /api/login, /api/logout, /api/logout-all, /api/refresh, /api/me, /api/health
+  - **Prueba 5: Operaciones de Base de Datos** - PASÓ
+    - Usuario admin encontrado (ID: 10, rol: admin)
+    - Usuario usuario encontrado (ID: 11, rol: usuario)
+    - Token agregado a blacklist
+    - Token verificado en blacklist
+    - Versión de token obtenida
+    - Todos los tokens revocados (versión incrementada)
+  - **Prueba 6: Decoradores de Autenticación** - PASÓ
+    - Decoradores importados correctamente
+    - Rutas de prueba creadas con @token_required, @admin_required, @optional_token
+  - **Resultado Final: 6/6 pruebas pasadas (100%)**
+  - Todas las funcionalidades de la Fase 3 verificadas y funcionando correctamente
+- **Estado:** Completado
+
+## [2026-04-22] - Fase 3: Middleware de Autenticación con PyJWT - Implementación Completa
+- **Archivos Modificados:** `Backend/auth/__init__.py`, `Backend/auth/jwt_handler.py`, `Backend/routes/__init__.py`, `Backend/routes/auth.py`, `Backend/app.py`, `Backend/init_test_users.py`, `Backend/test_auth_endpoints.py`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - **Estructura de carpetas creada:**
+    - `Backend/auth/` - Módulo de autenticación JWT
+    - `Backend/routes/` - Módulo de rutas API de Flask
+  - **Módulo `auth/jwt_handler.py` implementado:**
+    - Funciones de blacklist: [`add_token_to_blacklist()`](Backend/auth/jwt_handler.py:35), [`is_token_revoked()`](Backend/auth/jwt_handler.py:50), [`revoke_all_user_tokens()`](Backend/auth/jwt_handler.py:60), [`get_user_token_version()`](Backend/auth/jwt_handler.py:73), [`cleanup_expired_revoked_tokens()`](Backend/auth/jwt_handler.py:82)
+    - Generación de tokens: [`generate_token()`](Backend/auth/jwt_handler.py:94), [`generate_refresh_token()`](Backend/auth/jwt_handler.py:125)
+    - Validación de tokens: [`decode_token()`](Backend/auth/jwt_handler.py:147), [`token_required`](Backend/auth/jwt_handler.py:179) (decorador), [`admin_required`](Backend/auth/jwt_handler.py:227) (decorador), [`optional_token`](Backend/auth/jwt_handler.py:249) (decorador)
+    - Configuración JWT: JWT_SECRET_KEY, JWT_ALGORITHM="HS256", JWT_EXPIRATION_HOURS=24, JWT_REFRESH_EXPIRATION_DAYS=7
+  - **Módulo `routes/auth.py` implementado:**
+    - [`POST /api/login`](Backend/routes/auth.py:24) - Login con generación de access y refresh tokens
+    - [`POST /api/logout`](Backend/routes/auth.py:80) - Logout revocando el token actual (agrega jti a blacklist)
+    - [`POST /api/logout-all`](Backend/routes/auth.py:109) - Revoca todos los tokens del usuario (incrementa versión)
+    - [`POST /api/refresh`](Backend/routes/auth.py:126) - Renueva access token usando refresh token (one-time use)
+    - [`GET /api/me`](Backend/routes/auth.py:169) - Obtiene información del usuario actual desde el token
+    - [`GET /api/health`](Backend/routes/auth.py:182) - Health check del servicio de autenticación
+  - **Aplicación Flask `app.py` creada:**
+    - Configuración de CORS para permitir peticiones cross-origin
+    - Registro de blueprints (auth_bp)
+    - Inicialización de base de datos y directorios
+    - Rutas globales: `/` (información de la API), `/health` (health check general)
+    - Manejadores de errores: 400, 401, 403, 404, 405, 429, 500
+  - **Scripts de prueba creados:**
+    - [`init_test_users.py`](Backend/init_test_users.py) - Crea usuarios admin y usuario de prueba
+    - [`test_auth_endpoints.py`](Backend/test_auth_endpoints.py) - Prueba todos los endpoints de autenticación
+  - **Características de seguridad implementadas:**
+    - JWT con jti único para revocación individual
+    - Versión de token para revocación masiva (logout-all)
+    - Validación de token contra blacklist en SQLite
+    - Refresh token de un solo uso (se revoca después de usarlo)
+    - Hash de contraseñas con bcrypt
+    - Registro de intentos de login (exitosos y fallidos)
+  - **Dependencias instaladas:** PyJWT 2.12.1, bcrypt 5.0.0, flask-cors 6.0.2
+  - **Usuarios de prueba creados:**
+    - Admin: admin@argos.com / Admin123
+    - Usuario: user@argos.com / Usuario123
+- **Estado:** Completado
+
+## [2026-04-22] - Corrección Fase 3: Función eliminar_registro_trazabilidad Agregada
+- **Archivos Modificados:** `Backend/database/db.py`, `CHANGELOG.md`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - Agregada función [`eliminar_registro_trazabilidad()`](Backend/database/db.py:790) a `Backend/database/db.py`
+  - Función elimina un registro de trazabilidad por ID
+  - Se usa cuando una tarea es rechazada por el ThreadPool saturado (línea 1824 de `plan_backend.md`)
+  - Implementación: `DELETE FROM trazabilidad WHERE id = ?`
+  - Retorna `True` si se eliminó correctamente
+  - **Estado del plan Fase 3: 100% Completo** - Listo para implementación
+- **Estado:** Completado
+
+## [2026-04-22] - Análisis de Integridad Fase 3: Middleware de Autenticación con PyJWT
+- **Archivos Modificados:** `plans/analisis_fase3.md` (creado)
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - Realizado análisis completo de integridad del plan_backend para iniciar la Fase 3
+  - **Estado General: 95% Completo** - Casi listo para implementación
+  - **Componentes verificados:**
+    - ✅ Base de Datos: Todas las tablas y operaciones necesarias (usuarios, tokens_revocados, user_token_versions, intentos_login)
+    - ✅ Middleware JWT: 11 funciones definidas (generate_token, decode_token, token_required, admin_required, etc.)
+    - ✅ Endpoints Auth: 5 endpoints definidos (/api/login, /api/logout, /api/logout-all, /api/refresh, /api/me)
+    - ✅ Dependencias: Flask, flask-cors, PyJWT, bcrypt, opencv-python
+  - **Elemento faltante detectado:**
+    - ❌ Función `eliminar_registro_trazabilidad()` no definida en `database/operations.py`
+    - Se usa en línea 1824 de `plan_backend.md` cuando el ThreadPool está saturado
+    - Solución propuesta: Agregar función para eliminar registro de trazabilidad por ID
+  - **Recomendaciones:**
+    1. Agregar función faltante a `database/operations.py`
+    2. Validar consistencia entre módulos antes de implementar
+    3. Preparar entorno de pruebas con datos de prueba
+- **Estado:** Pendiente de corrección (falta 1 función)
+
+## [2026-04-22] - Fase 2 Backend: Pruebas Completas - Todas las Funcionalidades Verificadas
+- **Archivos Modificados:** `Backend/test_fase2_completo.py` (creado)
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - Creado script de prueba completo `Backend/test_fase2_completo.py` con 9 suites de pruebas
+  - **Prueba 1: Conexión a BD con WAL Mode** - 3/3 pruebas pasaron
+    - Conexión exitosa a SQLite
+    - WAL Mode habilitado correctamente
+    - Context manager get_db() funciona correctamente
+  - **Prueba 2: Operaciones CRUD de Usuarios** - 11/11 pruebas pasaron
+    - Crear, obtener (por ID, username, email), verificar documento, listar usuarios
+    - Actualizar rol, verificar email, actualizar password, toggle estado, eliminar usuario
+  - **Prueba 3: Códigos de Verificación** - 5/5 pruebas pasaron
+    - Crear código, verificar válido, verificar usado, verificar inválido, limpiar expirados
+  - **Prueba 4: Operaciones de Trazabilidad** - 12/12 pruebas pasaron
+    - Crear registro, actualizar estado/progreso, marcar error, obtener (por task_id, ID)
+    - Obtener historial usuario, tareas pendientes, por estado, por worker, estadísticas
+  - **Prueba 5: Tokens Revocados (Blacklist)** - 7/7 pruebas pasaron
+    - Agregar token, verificar revocado, verificar no revocado, obtener versión
+    - Revocar todos los tokens, verificar nueva versión, limpiar expirados
+  - **Prueba 6: Operaciones de Sesiones** - 5/5 pruebas pasaron
+    - Crear sesión, validar sesión, cerrar sesión, validar cerrada, limpiar expiradas
+  - **Prueba 7: Intentos de Login** - 3/3 pruebas pasaron
+    - Registrar intento exitoso, registrar intento fallido, contar intentos fallidos por IP
+  - **Prueba 8: Utilidades de Archivos** - 5/5 pruebas pasaron
+    - Asegurar directorios, generar nombre (con/sin usuario), obtener ruta (original/procesada)
+  - **Prueba 9: Logs del Sistema** - 5/5 pruebas pasaron
+    - Crear log INFO, crear log ERROR, obtener logs, obtener por nivel, limpiar antiguos
+  - **Resultado Final: 9/9 suites pasadas (56/56 pruebas individuales)**
+  - Todas las funcionalidades de la Fase 2 verificadas y funcionando correctamente
+- **Estado:** Completado
+
+## [2026-04-22] - Fase 2.4 Backend: Tabla de Trazabilidad con Soporte para Procesamiento Asíncrono (Verificado)
+- **Archivos Modificados:** `Backend/database/db.py` (verificado)
+- **Acción:** Verificado
+- **Descripción Técnica:**
+  - Verificada tabla `trazabilidad` con soporte completo para procesamiento asíncrono
+  - Estados implementados: PENDING, PROCESSING, COMPLETED, FAILED, RETRY, CANCELLED
+  - Campos principales: task_id (UNIQUE), estado, timestamp_inicio, timestamp_fin, progreso (0-100), mensaje_progreso
+  - Campos adicionales: imagen_entrada, imagen_salida, parametros (JSON), resultado, error_log, error_type, error_traceback
+  - Campos de control: reintentos, max_reintentos, worker_id, prioridad, tiempo_procesamiento_ms
+  - 7 índices optimizados: usuario, timestamp, operacion, estado, task_id, worker_id, prioridad
+  - 12 funciones de operaciones implementadas:
+    - [`crear_registro_trazabilidad()`](Backend/database/db.py:529) - Crea registro con estado PENDING
+    - [`actualizar_estado_trazabilidad()`](Backend/database/db.py:562) - Actualiza estado y progreso
+    - [`incrementar_reintento()`](Backend/database/db.py:654) - Incrementa contador de reintentos
+    - [`marcar_error_trazabilidad()`](Backend/database/db.py:665) - Marca registro como FAILED
+    - [`obtener_trazabilidad_por_task_id()`](Backend/database/db.py:686) - Obtiene por task_id
+    - [`obtener_trazabilidad_por_id()`](Backend/database/db.py:695) - Obtiene por ID
+    - [`obtener_historial_usuario()`](Backend/database/db.py:705) - Historial de usuario
+    - [`obtener_tareas_pendientes()`](Backend/database/db.py:717) - Tareas PENDING/PROCESSING/RETRY
+    - [`obtener_tareas_por_estado()`](Backend/database/db.py:728) - Filtra por estado
+    - [`obtener_tareas_por_worker()`](Backend/database/db.py:739) - Tareas por worker
+    - [`obtener_estadisticas_tareas()`](Backend/database/db.py:750) - Estadísticas generales
+    - [`limpiar_tareas_antiguas()`](Backend/database/db.py:770) - Elimina tareas antiguas
+  - Soporte completo para ThreadPoolExecutor con tracking de tareas asíncronas
+- **Estado:** Completado (implementado en Fase 2.1 y 2.2)
+
+## [2026-04-20] - Fase 2.3 Backend: Gestión de Nombres de Archivo con UUIDs (Verificado)
+- **Archivos Modificados:** `Backend/database/utils.py` (verificado)
+- **Acción:** Verificado
+- **Descripción Técnica:**
+  - Verificada implementación de funciones de gestión de archivos con UUIDs
+  - Función [`ensure_directories()`](Backend/database/utils.py:15) - Crea directorios `uploads/` y `processed/` si no existen
+  - Función [`generate_image_filename()`](Backend/database/utils.py:21) - Genera nombres únicos usando UUID v4
+  - Función [`get_image_path()`](Backend/database/utils.py:60) - Obtiene ruta completa de imágenes
+  - Formato de nombres: `{operation}_{user_id}_{uuid}.{ext}` o `{operation}_{uuid}.{ext}`
+  - Evita colisiones de nombres de archivo en operaciones concurrentes
+  - Soporta trazabilidad por usuario mediante user_id opcional
+- **Estado:** Completado (implementado en Fase 2.1)
+
+## [2026-04-20] - Fase 2.2 Backend: Módulo database/db.py Mejorado con Operaciones CRUD
+- **Archivos Modificados:** `Backend/database/db.py`
+- **Acción:** Modificado
+- **Descripción Técnica:**
+  - Agregada importación de `timedelta` de `datetime` para cálculos de tiempo
+  - Implementadas 11 operaciones CRUD para usuarios: `crear_usuario`, `obtener_usuario_por_id`, `obtener_usuario_por_username`, `obtener_usuario_por_email`, `verificar_documento_existe`, `listar_usuarios`, `actualizar_rol_usuario`, `toggle_estado_usuario`, `verificar_email_usuario`, `actualizar_password`, `eliminar_usuario`
+  - Implementadas 4 operaciones CRUD para códigos de verificación: `crear_codigo_verificacion`, `verificar_codigo`, `limpiar_codigos_expirados`
+  - Implementadas 11 operaciones CRUD para trazabilidad: `crear_registro_trazabilidad`, `actualizar_estado_trazabilidad`, `incrementar_reintento`, `marcar_error_trazabilidad`, `obtener_trazabilidad_por_task_id`, `obtener_trazabilidad_por_id`, `obtener_historial_usuario`, `obtener_tareas_pendientes`, `obtener_tareas_por_estado`, `obtener_tareas_por_worker`, `obtener_estadisticas_tareas`, `limpiar_tareas_antiguas`
+  - Implementadas 5 operaciones CRUD para tokens revocados: `agregar_token_revocado`, `verificar_token_revocado`, `revocar_todos_tokens_usuario`, `obtener_version_token_usuario`, `limpiar_tokens_expirados`
+  - Implementadas 4 operaciones CRUD para sesiones: `crear_sesion`, `validar_sesion`, `cerrar_sesion`, `limpiar_sesiones_expiradas`
+  - Implementadas 2 operaciones CRUD para intentos de login: `registrar_intento_login`, `obtener_intentos_fallidos`
+  - Implementadas 3 operaciones CRUD para logs del sistema: `crear_log`, `obtener_logs`, `limpiar_logs_antiguos`
+  - Total de 40 nuevas funciones CRUD implementadas en el módulo `database/db.py`
+  - Corregida anotación de tipo de retorno de `row_to_dict` para permitir `Optional[Dict[str, Any]]`
+  - Mejorado manejo de valores `None` en funciones que retornan IDs
+- **Estado:** Completado
+
+## [2026-04-20] - Fase 2.1 Backend: Configuración de SQLite con WAL Mode
+- **Archivos Modificados:** `Backend/database/__init__.py`, `Backend/database/db.py`, `Backend/database/utils.py`, `Backend/test_db.py`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - Creada estructura de directorios `Backend/database/`, `Backend/uploads/`, `Backend/processed/`
+  - Implementado módulo `database/db.py` con conexión SQLite configurada con WAL mode
+  - Habilitado thread-local storage para conexiones por hilo (evita conflictos)
+  - Configuraciones de rendimiento: synchronous=NORMAL, cache_size=64MB, busy_timeout=30s
+  - Creadas 8 tablas: usuarios, codigos_verificacion, trazabilidad, sesiones, intentos_login, tokens_revocados, user_token_versions, logs_sistema
+  - Creados 33 índices para optimización de consultas frecuentes
+  - Implementado módulo `database/utils.py` para gestión de nombres de archivo con UUIDs
+  - Funciones: `generate_image_filename()`, `get_image_path()`, `ensure_directories()`
+  - Script de prueba `Backend/test_db.py` para verificación de inicialización
+  - Base de datos inicializada exitosamente en `Backend/argos2.db`
+- **Estado:** Completado
+
+## [2026-04-20] - Fase 1 Backend: Configuración del Entorno
+- **Archivos Modificados:** `Backend/venv/`, `Backend/requirements.txt`
+- **Acción:** Añadido
+- **Descripción Técnica:**
+  - Creado entorno virtual Python en `Backend/venv/`
+  - Instaladas dependencias principales: Flask 3.1.3, flask-cors 6.0.2, opencv-python 4.13.0.92, PyJWT 2.12.1, bcrypt 5.0.0
+  - Dependencias adicionales instaladas: numpy 2.2.6, Werkzeug 3.1.8, Jinja2 3.1.6, click 8.3.2, blinker 1.9.0
+  - Actualizado `requirements.txt` con todas las dependencias del entorno virtual
+- **Estado:** Completado
+

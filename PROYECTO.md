@@ -1,0 +1,1 @@
+Proyecto de Visión Computacional. Backend: Python + Flask. Procesamiento de imágenes: OpenCV. Frontend: HTML/CSS/JS. Objetivo: Construir la infraestructura cliente-servidor primero usando respuestas simuladas (mocks) antes de entrenar la red neuronal.

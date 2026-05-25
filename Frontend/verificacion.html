@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6A1B9A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+    <title>Verificación de Correo - Argos2</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="verificacion-container glass-container">
+        <div class="verificacion-header">
+            <img src="assets/icons/sobre.svg" class="icon-large" alt="Icono sobre">
+            <h1>Verificación de Correo</h1>
+        </div>
+        
+        <p class="info-text">Se ha enviado un código de verificación a:</p>
+        <p class="email-display" id="user-email">usuario@correo.com</p>
+        <p class="expiry-info">El código expira en 2 minutos</p>
+        
+        <form id="verificacion-form">
+            <div class="code-input-group">
+                <input type="text" maxlength="1" class="code-digit" data-index="0" inputmode="numeric" pattern="[0-9]" required>
+                <input type="text" maxlength="1" class="code-digit" data-index="1" inputmode="numeric" pattern="[0-9]" required>
+                <input type="text" maxlength="1" class="code-digit" data-index="2" inputmode="numeric" pattern="[0-9]" required>
+                <input type="text" maxlength="1" class="code-digit" data-index="3" inputmode="numeric" pattern="[0-9]" required>
+                <input type="text" maxlength="1" class="code-digit" data-index="4" inputmode="numeric" pattern="[0-9]" required>
+                <input type="text" maxlength="1" class="code-digit" data-index="5" inputmode="numeric" pattern="[0-9]" required>
+            </div>
+            <button type="submit" id="btn-verificar">VERIFICAR</button>
+        </form>
+        
+        <div class="resend-section">
+            <span id="countdown">Reenviar código en 120s</span>
+            <a href="#" id="resend-link" style="display:none">Reenviar código</a>
+        </div>
+        
+        <div class="link-volver">
+            <a href="index.html">Volver al login</a>
+        </div>
+        
+        <div id="message" class="message"></div>
+    </div>
+    
+    <script src="js/toast.js?v=20260505b"></script>
+    <script src="js/auth2.js"></script>
+    <script src="js/verificacion.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('[SW] Registrado:', reg.scope))
+                    .catch(err => console.warn('[SW] Error al registrar:', err));
+            });
+        }
+    </script>
+</body>
+</html>

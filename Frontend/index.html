@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6A1B9A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+    <title>Argos2 - Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="login-container glass-container">
+        <!-- Header -->
+        <div class="login-header">
+            <img src="assets/img/Logo.png" alt="Argos2 Logo" class="logo">
+            <img src="assets/icons/monitor.svg" alt="Monitor" class="icon">
+            <h1>Iniciar Sesión</h1>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form">
+            <!-- Username Input -->
+            <div class="input-group">
+                <label for="username">USUARIO</label>
+                <div class="input-wrapper">
+                    <img src="assets/icons/usuario.svg" alt="Usuario" class="input-icon">
+                    <input type="text" id="username" name="username" placeholder="Ingrese su usuario" required autocomplete="username">
+                </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="input-group">
+                <label for="password">CLAVE</label>
+                <div class="input-wrapper">
+                    <img src="assets/icons/llave.svg" alt="Clave" class="input-icon">
+                    <input type="password" id="password" name="password" placeholder="Ingrese su clave" required autocomplete="current-password">
+                </div>
+            </div>
+
+            <!-- Button Group -->
+            <div class="button-group">
+                <button type="button" id="btn-registrar">REGISTRAR</button>
+                <button type="submit" id="btn-ingresar">INGRESAR</button>
+            </div>
+        </form>
+
+        <!-- Forgot Password Link -->
+        <div class="link-forgot">
+            <a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- Message Container -->
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/toast.js?v=20260505b"></script>
+    <script src="js/auth2.js"></script>
+    <script>
+        // ============================================
+        // Event Listeners - Login Page
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
+            const btnRegistrar = document.getElementById('btn-registrar');
+            const btnIngresar = document.getElementById('btn-ingresar');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            // Verificar si ya hay una sesión activa
+            if (isLoggedIn()) {
+                const session = getSession();
+                // El rol puede estar en session.rol (mock) o session.user.rol (backend)
+                const rol = session.user ? session.user.rol : session.rol;
+                if (rol === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                return;
+            }
+
+            // ============================================
+            // Leer parámetros de URL para mensajes post-acción
+            // ============================================
+            const urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.get('verified') === 'true') {
+                showToast('¡Correo verificado exitosamente! Ya puedes iniciar sesión.', 'success');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            if (urlParams.get('reset') === 'true') {
+                showToast('Contraseña restablecida. Inicia sesión con tu nueva contraseña.', 'success');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            // Botón Registrar - Redirige a la página de registro
+            btnRegistrar.addEventListener('click', () => {
+                window.location.href = 'registro.html';
+            });
+
+            // Formulario de Login
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                // Validar campos
+                if (!username || !password) {
+                    showToast('Por favor complete todos los campos', 'warning');
+                    return;
+                }
+
+                // Deshabilitar botón durante el proceso
+                btnIngresar.disabled = true;
+                btnIngresar.textContent = 'VERIFICANDO...';
+
+                try {
+                    showToast('Iniciando sesión...', 'info');
+
+                    const result = await login(username, password);
+
+                    if (result) {
+                        showToast('¡Sesión iniciada correctamente!', 'success');
+                        
+                        // Redirigir según el rol del usuario
+                        setTimeout(() => {
+                            // El rol puede estar en result.rol (mock) o result.user.rol (backend)
+                            const rol = result.user ? result.user.rol : result.rol;
+                            if (rol === 'admin') {
+                                window.location.href = 'admin.html';
+                            } else {
+                                window.location.href = 'dashboard.html';
+                            }
+                        }, 1000);
+                    }
+                } catch (error) {
+                    showToast(error.message || 'Error al iniciar sesión', 'error');
+                    
+                    // Limpiar contraseña por seguridad
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                } finally {
+                    // Rehabilitar botón
+                    btnIngresar.disabled = false;
+                    btnIngresar.textContent = 'INGRESAR';
+                }
+            });
+
+            // Permitir presionar Enter para enviar el formulario
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>

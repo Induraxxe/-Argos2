@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6A1B9A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+    <title>Panel de Administración - Argos2</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Ocultar contenido hasta verificar autenticación -->
+    <style>
+        body { opacity: 0; transition: opacity 0.3s ease-in; }
+        body.auth-ready { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Navbar -->
+        <nav class="navbar glass-container">
+            <div class="nav-brand">
+                <img src="assets/img/Logo.png" class="logo-small" alt="Argos2 Logo">
+                <span>Argos2 - Panel de Administración</span>
+            </div>
+            <div class="nav-user">
+                <img src="assets/icons/escudo.svg" class="icon" alt="Icono escudo">
+                <span id="admin-name">Admin</span>
+                <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Admin Header -->
+            <div class="admin-header glass-container">
+                <h2>Gestión de Usuarios</h2>
+                <span id="user-count">Total: 0 usuarios</span>
+            </div>
+
+            <!-- Users Table -->
+            <div class="users-table-container glass-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Fecha Nac.</th>
+                            <th>Teléfono</th>
+                            <th>Documento</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <!-- Filas de usuarios dinámicas -->
+                    </tbody>
+                </table>
+                <div id="no-users" class="no-users" style="display: none;">
+                    <p>No hay usuarios registrados</p>
+                </div>
+                <div id="loading-users" class="loading-users">
+                    <p>Cargando usuarios...</p>
+                </div>
+            </div>
+
+            <!-- Admin Actions -->
+            <div class="admin-actions">
+                <button id="btn-refresh" class="btn-primary">Actualizar Lista</button>
+            </div>
+        </main>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/toast.js?v=20260505b"></script>
+    <script src="js/auth2.js"></script>
+    <script src="js/admin.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('[SW] Registrado:', reg.scope))
+                    .catch(err => console.warn('[SW] Error al registrar:', err));
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Iconos PWA - Argos2</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+        h1 { color: #CE93D8; }
+        .icons { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        .icon-box { text-align: center; }
+        .icon-box canvas { border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; }
+        .btn {
+            padding: 12px 24px;
+            background: #6A1B9A;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover { background: #8E24AA; }
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 500px;
+            text-align: center;
+        }
+        .instructions p { margin: 8px 0; font-size: 14px; color: rgba(255,255,255,0.7); }
+    </style>
+</head>
+<body>
+    <h1>Argos2 - Generador de Iconos PWA</h1>
+    <div class="instructions">
+        <p>Haz clic en cada botón para descargar los iconos.</p>
+        <p>Guarda los archivos en <code>Frontend/assets/img/</code></p>
+    </div>
+    <div class="icons">
+        <div class="icon-box">
+            <canvas id="canvas192" width="192" height="192"></canvas><br>
+            <button class="btn" onclick="downloadIcon('canvas192', 'icon-192.png')">Descargar 192x192</button>
+        </div>
+        <div class="icon-box">
+            <canvas id="canvas512" width="512" height="512"></canvas><br>
+            <button class="btn" onclick="downloadIcon('canvas512', 'icon-512.png')">Descargar 512x512</button>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            const scale = size / 512;
+
+            // Fondo con gradiente
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#4A148C');
+            gradient.addColorStop(1, '#6A1B9A');
+            ctx.fillStyle = gradient;
+
+            // Fondo redondeado
+            const r = 80 * scale;
+            ctx.beginPath();
+            ctx.moveTo(r, 0);
+            ctx.lineTo(size - r, 0);
+            ctx.quadraticCurveTo(size, 0, size, r);
+            ctx.lineTo(size, size - r);
+            ctx.quadraticCurveTo(size, size, size - r, size);
+            ctx.lineTo(r, size);
+            ctx.quadraticCurveTo(0, size, 0, size - r);
+            ctx.lineTo(0, r);
+            ctx.quadraticCurveTo(0, 0, r, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Ojo estilizado (Argos = los 100 ojos)
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 8 * scale;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Forma del ojo (almendra)
+            const cx = size / 2;
+            const cy = size / 2;
+            const eyeW = 160 * scale;
+            const eyeH = 80 * scale;
+
+            ctx.beginPath();
+            ctx.moveTo(cx - eyeW, cy);
+            ctx.quadraticCurveTo(cx, cy - eyeH, cx + eyeW, cy);
+            ctx.quadraticCurveTo(cx, cy + eyeH, cx - eyeW, cy);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fill();
+
+            // Iris
+            const irisR = 50 * scale;
+            ctx.beginPath();
+            ctx.arc(cx, cy, irisR, 0, Math.PI * 2);
+            ctx.fillStyle = '#CE93D8';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 4 * scale;
+            ctx.stroke();
+
+            // Pupila
+            const pupilR = 22 * scale;
+            ctx.beginPath();
+            ctx.arc(cx, cy, pupilR, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+
+            // Brillo
+            const glareR = 10 * scale;
+            ctx.beginPath();
+            ctx.arc(cx - 15 * scale, cy - 15 * scale, glareR, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.fill();
+
+            // Texto "ARGOS2"
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${36 * scale}px 'Segoe UI', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('ARGOS2', cx, cy + 130 * scale);
+        }
+
+        function downloadIcon(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Generar iconos al cargar
+        drawIcon('canvas192');
+        drawIcon('canvas512');
+    </script>
+</body>
+</html>

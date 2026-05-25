@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6A1B9A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+    <title>Dashboard - Argos2 Visión Computacional</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Ocultar contenido hasta verificar autenticación -->
+    <style>
+        body { opacity: 0; transition: opacity 0.3s ease-in; }
+        body.auth-ready { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Navbar -->
+        <nav class="navbar glass-container">
+            <div class="nav-brand">
+                <img src="assets/img/Logo.png" class="logo-small" alt="Argos2 Logo">
+                <span>Argos2 - Visión Computacional</span>
+            </div>
+            <div class="nav-user">
+                <span id="username-display">Usuario</span>
+                <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <!-- Welcome Card -->
+            <div class="welcome-card glass-container">
+                <h2>Bienvenido a Argos2</h2>
+                <p>Sistema de Visión Computacional</p>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="upload-section glass-container">
+                <h3>Procesamiento de Imágenes</h3>
+                <form id="vision-form">
+                    <div class="file-input-group">
+                        <input type="file" id="image-input" accept="image/*">
+                        <label for="image-input" class="file-label">
+                            <img src="assets/icons/documento.svg" class="input-icon" alt="Icono documento">
+                            <span>Seleccionar Imagen</span>
+                        </label>
+                        <span id="file-name" class="file-name"></span>
+                    </div>
+
+                    <div class="select-group">
+                        <label for="operation-select">Tipo de Operación</label>
+                        <select id="operation-select">
+                            <option value="deteccion">Detección</option>
+                            <option value="clasificacion">Clasificación</option>
+                            <option value="mejora">Mejora de Imagen</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="btn-process" class="btn-primary">Procesar Imagen</button>
+                </form>
+            </div>
+
+            <!-- Status Section -->
+            <div class="status-section glass-container">
+                <div id="task-status">Estado: Esperando imagen...</div>
+                <div id="progress-bar" class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section glass-container" id="result-section" style="display: none;">
+                <h3>Resultado</h3>
+                <div class="result-content">
+                    <img id="result-image" alt="Imagen procesada">
+                    <div id="result-info" class="result-info"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/toast.js?v=20260505b"></script>
+    <script src="js/auth2.js"></script>
+    <script src="js/vision.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('[SW] Registrado:', reg.scope))
+                    .catch(err => console.warn('[SW] Error al registrar:', err));
+            });
+        }
+    </script>
+</body>
+</html>
