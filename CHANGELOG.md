@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026-05-25] - Configuración repositorio GitHub y push inicial
+- **Archivos Modificados:** `.gitignore`
+- **Acción:** Añadido / Modificado
+- **Descripción Técnica:** Inicialización del repositorio Git local, configuración de remote `https://github.com/Induraxxe/-Argos2.git`, commit inicial con 60 archivos (11820 inserciones), y push exitoso a la rama `main`. Se actualizó `.gitignore` para excluir archivos del desarrollador: `.clinerules`, `.gitignore`, `plans/`. Archivos sensibles ya excluidos: `.env`, `*.db`, `venv/`, `__pycache__/`, uploads/processed (excepto `.gitkeep`).
+- **Estado:** Completado
+
 ## [2026-05-25] - Documentación completa del proyecto para GitHub
 
 - **Archivos Modificados:** `README.md`, `install.bat`, `install.sh`, `.env.example`, `Backend/uploads/.gitkeep`, `Backend/processed/.gitkeep`
