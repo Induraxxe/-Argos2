@@ -195,9 +195,44 @@ if [ "$SKIP_ENV" != "1" ]; then
     echo "   ─────────────────────────────────────────────"
     echo "   Configuración de correo SMTP"
     echo "   ─────────────────────────────────────────────"
+    echo "   El correo de la empresa se configura automáticamente."
+    echo "   (No requiere acción del usuario)"
     echo ""
-    read -p "   Correo SMTP (ej: tu_correo@gmail.com): " ENV_EMAIL
-    read -p "   Contraseña de aplicación SMTP: " ENV_EMAIL_PASS
+
+    echo ""
+    echo "   ─────────────────────────────────────────────"
+    echo "   Configuración de Visión Computacional (Roboflow)"
+    echo "   ─────────────────────────────────────────────"
+    echo "   Puede dejar los campos vacíos y configurarlos después."
+    echo "   (Valores entre paréntesis = valor por defecto al pulsar Enter)"
+    echo ""
+
+    while true; do
+        read -p "   Modo de visión por defecto [off/cloud/local] (off): " VISION_MODE
+        VISION_MODE=${VISION_MODE:-off}
+        case "$VISION_MODE" in
+            off|cloud|local) break ;;
+            *) echo "   ⚠️  Opción no válida. Use: off, cloud o local." ;;
+        esac
+    done
+
+    read -p "   API Key de Roboflow (vacío = configurar después): " RF_API_KEY
+    read -p "   URL servidor serverless de Roboflow (https://serverless.roboflow.com): " RF_API_URL
+    RF_API_URL=${RF_API_URL:-https://serverless.roboflow.com}
+    read -p "   Workspace de Roboflow (ej: oswaldos-workspace-0ikuh): " RF_WORKSPACE
+    read -p "   Workflow ID (ej: custom-workflow-4): " RF_WORKFLOW_ID
+    read -p "   Input de imagen del workflow (image): " RF_IMG_INPUT
+    RF_IMG_INPUT=${RF_IMG_INPUT:-image}
+    read -p "   Usar caché del workflow [true/false] (true): " RF_USE_CACHE
+    RF_USE_CACHE=${RF_USE_CACHE:-true}
+    read -p "   Usar overlay del servidor [true/false] (false): " RF_SERVER_OVERLAY
+    RF_SERVER_OVERLAY=${RF_SERVER_OVERLAY:-false}
+
+    RF_MODEL_ID=""
+    read -p "   ¿Configurar MODEL_ID estándar? (solo si NO usa workflows) (s/N): " ASK_MODEL
+    if [ "$ASK_MODEL" = "s" ] || [ "$ASK_MODEL" = "S" ]; then
+        read -p "      MODEL_ID (ej: proyecto/1): " RF_MODEL_ID
+    fi
 
     echo ""
     echo "   Generando secretos automáticos..."
@@ -211,12 +246,33 @@ if [ "$SKIP_ENV" != "1" ]; then
     # Escribir archivo .env
     cat > .env << EOF
 # Configuración de correo SMTP
-EMAIL_FROM=${ENV_EMAIL}
-EMAIL_PASSWORD=${ENV_EMAIL_PASS}
+EMAIL_FROM=sqprpject@gmail.com
+EMAIL_PASSWORD=vzon onlg cxyu irji
+EMAIL_SMTP=smtp.gmail.com
+EMAIL_PORT=587
 
 # Secretos de la aplicación
 SECRET_KEY=${SECRET_KEY_GEN}
 JWT_SECRET_KEY=${JWT_SECRET_GEN}
+
+# ============================
+# Visión Computacional (Roboflow)
+# ============================
+VISION_DEFAULT_MODE=${VISION_MODE}
+ROBOFLOW_API_KEY=${RF_API_KEY}
+ROBOFLOW_API_URL=${RF_API_URL}
+ROBOFLOW_WORKSPACE=${RF_WORKSPACE}
+ROBOFLOW_WORKFLOW_ID=${RF_WORKFLOW_ID}
+ROBOFLOW_WORKFLOW_IMAGE_INPUT=${RF_IMG_INPUT}
+ROBOFLOW_WORKFLOW_USE_CACHE=${RF_USE_CACHE}
+ROBOFLOW_USE_SERVER_OVERLAY=${RF_SERVER_OVERLAY}
+ROBOFLOW_MODEL_ID=${RF_MODEL_ID}
+
+# --- Modo Local (Inferencia Edge) ---
+ROBOFLOW_LOCAL_MODEL_ID=
+INFERENCE_DEVICE=cpu
+LOCAL_INFERENCE_WORKERS=2
+SAMPLE_INTERVAL=1.5
 EOF
 
     echo -e "   ${GREEN}✅ Archivo .env creado con secretos generados automáticamente${NC}"

@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Importar blueprints
-from routes import auth_bp, admin_bp, vision_bp
+from routes import auth_bp, admin_bp, vision_bp, camera_bp, settings_bp
 
 # Importar rate limiter
 from middleware.rate_limiter import limiter
@@ -63,13 +63,51 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(vision_bp)
+    app.register_blueprint(camera_bp)
+    app.register_blueprint(settings_bp)
     
     # Inicializar base de datos
     init_database()
     ensure_directories()
+
+    # Sincronizar settings de visión: la DB es la fuente de verdad.
+    # Los valores persistidos en la DB se cargan en os.environ para que los
+    # motores de visión los tomen al instanciarse.
+    try:
+        from services.settings_service import sync_settings_to_env
+        sync_settings_to_env()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(
+            "No se pudieron sincronizar los settings de visión: %s", e
+        )
     
     # Iniciar limpieza periódica de tokens expirados
     start_cleanup_scheduler(interval_hours=1)
+    
+    # =====================
+    # Shutdown — Detener cámaras al cerrar la app
+    # =====================
+    
+    from services.camera_service import CameraManager as _CameraManager
+    
+    def _cleanup_cameras():
+        _CameraManager().shutdown_all()
+    
+    atexit.register(_cleanup_cameras)
+    
+    # =====================
+    # CORS headers para streams MJPEG
+    # =====================
+    
+    @app.after_request
+    def add_cors_headers(response):
+        """Agrega headers CORS específicos para streams MJPEG de cámaras."""
+        if '/api/cameras/' in request.path and '/stream' in request.path:
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return response
     
     # =====================
     # Rutas del Frontend (Páginas HTML)
@@ -161,6 +199,18 @@ def create_app():
                 'vision': {
                     'process': 'POST /api/vision/process',
                     'status': 'GET /api/vision/status/<task_id>'
+                },
+                'cameras_vision': {
+                    'start': 'POST /api/cameras/<id>/vision/start {mode}',
+                    'stop': 'POST /api/cameras/<id>/vision/stop',
+                    'stream': 'GET /api/cameras/<id>/vision/stream (MJPEG anotado)',
+                    'status': 'GET /api/cameras/<id>/vision/status',
+                    'modes': 'GET /api/cameras/vision/modes'
+                },
+                'settings': {
+                    'get_vision': 'GET /api/settings/vision (API key enmascarada)',
+                    'update_vision': 'PUT /api/settings/vision (admin)',
+                    'test_vision': 'GET /api/settings/vision/test (admin)'
                 },
                 'system': {
                     'health': 'GET /health',

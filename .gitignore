@@ -1,0 +1,58 @@
+# Variables de entorno (NUNCA subir al repositorio)
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+sdist/
+develop-eggs/
+.installed.cfg
+
+# Entorno virtual
+Backend/venv/
+venv/
+.venv/
+
+# Base de datos
+Backend/argos2.db
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Archivos subidos y procesados (datos de usuario)
+Backend/uploads/*
+Backend/processed/*
+!Backend/uploads/.gitkeep
+!Backend/processed/.gitkeep
+
+# Logs
+*.log
+
+# Archivos de configuración del desarrollador
+.clinerules
+
+# Planes y documentación interna del desarrollador
+plans/

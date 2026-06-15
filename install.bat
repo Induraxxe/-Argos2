@@ -202,9 +202,59 @@ echo.
 echo    ─────────────────────────────────────────────
 echo    Configuración de correo SMTP
 echo    ─────────────────────────────────────────────
+echo    El correo de la empresa se configura automáticamente.
+echo    (No requiere acción del usuario)
 echo.
-set /p ENV_EMAIL="   Correo SMTP (ej: tu_correo@gmail.com): "
-set /p ENV_EMAIL_PASS="   Contraseña de aplicación SMTP: "
+
+echo.
+echo    ─────────────────────────────────────────────
+echo    Configuración de Visión Computacional (Roboflow)
+echo    ─────────────────────────────────────────────
+echo    Puede dejar los campos vacíos y configurarlos después.
+echo    (Valores entre paréntesis = valor por defecto al pulsar Enter)
+echo.
+
+:ASK_VISION_MODE
+set "VISION_MODE=off"
+set /p VISION_MODE="   Modo de visión por defecto [off/cloud/local] (off): "
+if "!VISION_MODE!"=="" set "VISION_MODE=off"
+if /i "!VISION_MODE!"=="off" goto VISION_MODE_OK
+if /i "!VISION_MODE!"=="cloud" goto VISION_MODE_OK
+if /i "!VISION_MODE!"=="local" goto VISION_MODE_OK
+echo    ⚠️  Opción no válida. Use: off, cloud o local.
+goto ASK_VISION_MODE
+:VISION_MODE_OK
+
+set "RF_API_KEY="
+set /p RF_API_KEY="   API Key de Roboflow (vacío = configurar después): "
+
+set "RF_API_URL=https://serverless.roboflow.com"
+set /p RF_API_URL="   URL servidor serverless de Roboflow (https://serverless.roboflow.com): "
+
+set "RF_WORKSPACE="
+set /p RF_WORKSPACE="   Workspace de Roboflow (ej: oswaldos-workspace-0ikuh): "
+
+set "RF_WORKFLOW_ID="
+set /p RF_WORKFLOW_ID="   Workflow ID (ej: custom-workflow-4): "
+
+set "RF_IMG_INPUT=image"
+set /p RF_IMG_INPUT="   Input de imagen del workflow (image): "
+
+set "RF_USE_CACHE=true"
+set /p RF_USE_CACHE="   Usar caché del workflow [true/false] (true): "
+
+set "RF_SERVER_OVERLAY=false"
+set /p RF_SERVER_OVERLAY="   Usar overlay del servidor [true/false] (false): "
+
+set "ASK_MODEL=n"
+set /p ASK_MODEL="   ¿Configurar MODEL_ID estándar? (solo si NO usa workflows) (S/N): "
+if /i "!ASK_MODEL!"=="S" goto ASK_MODEL_YES
+set "RF_MODEL_ID="
+goto WRITE_VISION_DONE
+:ASK_MODEL_YES
+set "RF_MODEL_ID="
+set /p RF_MODEL_ID="      MODEL_ID (ej: proyecto/1): "
+:WRITE_VISION_DONE
 
 echo.
 echo    Generando secretos automáticos...
@@ -218,12 +268,33 @@ for /f "delims=" %%j in ('python -c "import secrets; print(secrets.token_hex(32)
 :: Escribir archivo .env
 (
 echo # Configuración de correo SMTP
-echo EMAIL_FROM=!ENV_EMAIL!
-echo EMAIL_PASSWORD=!ENV_EMAIL_PASS!
+echo EMAIL_FROM=sqprpject@gmail.com
+echo EMAIL_PASSWORD=vzon onlg cxyu irji
+echo EMAIL_SMTP=smtp.gmail.com
+echo EMAIL_PORT=587
 echo.
 echo # Secretos de la aplicación
 echo SECRET_KEY=!SECRET_KEY_GEN!
 echo JWT_SECRET_KEY=!JWT_SECRET_GEN!
+echo.
+echo # ============================
+echo # Visión Computacional ^(Roboflow^)
+echo # ============================
+echo VISION_DEFAULT_MODE=!VISION_MODE!
+echo ROBOFLOW_API_KEY=!RF_API_KEY!
+echo ROBOFLOW_API_URL=!RF_API_URL!
+echo ROBOFLOW_WORKSPACE=!RF_WORKSPACE!
+echo ROBOFLOW_WORKFLOW_ID=!RF_WORKFLOW_ID!
+echo ROBOFLOW_WORKFLOW_IMAGE_INPUT=!RF_IMG_INPUT!
+echo ROBOFLOW_WORKFLOW_USE_CACHE=!RF_USE_CACHE!
+echo ROBOFLOW_USE_SERVER_OVERLAY=!RF_SERVER_OVERLAY!
+echo ROBOFLOW_MODEL_ID=!RF_MODEL_ID!
+echo.
+echo # --- Modo Local ^(Inferencia Edge^) ---
+echo ROBOFLOW_LOCAL_MODEL_ID=
+echo INFERENCE_DEVICE=cpu
+echo LOCAL_INFERENCE_WORKERS=2
+echo SAMPLE_INTERVAL=1.5
 ) > .env
 
 echo    ✅ Archivo .env creado con secretos generados automáticamente

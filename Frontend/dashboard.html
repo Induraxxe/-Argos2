@@ -1,3 +1,5 @@
+<!-- Argos2 Dashboard v2.0 - Con soporte de cámaras en vivo -->
+<!-- Fases implementadas: Core, Backend, HTML, Monitoreo, Captura, Admin -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/img/icon-192.png">
     <title>Dashboard - Argos2 Visión Computacional</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=20260615b">
     <!-- Ocultar contenido hasta verificar autenticación -->
     <style>
         body { opacity: 0; transition: opacity 0.3s ease-in; }
@@ -30,66 +32,394 @@
             </div>
         </nav>
 
-        <!-- Main Content -->
-        <main class="dashboard-content">
-            <!-- Welcome Card -->
-            <div class="welcome-card glass-container">
-                <h2>Bienvenido a Argos2</h2>
-                <p>Sistema de Visión Computacional</p>
+        <!-- Tabs de navegación -->
+        <div class="dashboard-tabs glass-container">
+            <button class="tab-btn active" data-tab="monitoreo">
+                <img src="assets/icons/camara-grid.svg" class="tab-icon" alt="">
+                <span>Monitoreo</span>
+            </button>
+            <button class="tab-btn" data-tab="captura">
+                <img src="assets/icons/captura.svg" class="tab-icon" alt="">
+                <span>Captura</span>
+            </button>
+            <!-- Tab admin - solo visible si es admin -->
+            <button class="tab-btn tab-admin" data-tab="admin" style="display:none;">
+                <img src="assets/icons/admin-dashboard.svg" class="tab-icon" alt="">
+                <span>Admin</span>
+            </button>
+            <!-- Tab ajustes - solo visible si es admin -->
+            <button class="tab-btn tab-ajustes" data-tab="ajustes" style="display:none;">
+                <img src="assets/icons/llave.svg" class="tab-icon" alt="">
+                <span>Ajustes</span>
+            </button>
+        </div>
+
+        <!-- Contenido de tabs -->
+        <div class="tab-content">
+
+            <!-- TAB: Monitoreo en Vivo -->
+            <div id="tab-monitoreo" class="tab-panel active">
+                <div class="section-header">
+                    <h2>Monitoreo en Vivo</h2>
+                    <button id="btn-discover" class="btn-secondary">
+                        <img src="assets/icons/senal.svg" class="btn-icon" alt="">
+                        Buscar Cámaras
+                    </button>
+                </div>
+
+                <!-- Estado: Sin cámaras -->
+                <div id="no-cameras" class="empty-state">
+                    <img src="assets/icons/camara.svg" class="empty-icon" alt="">
+                    <h3>No se detectaron cámaras</h3>
+                    <p>Haz clic en "Buscar Cámaras" para detectar dispositivos conectados</p>
+                </div>
+
+                <!-- Estado: Una cámara (vista panorámica) -->
+                <div id="single-camera" class="single-camera-view" style="display:none;">
+                    <div class="camera-card single">
+                        <div class="camera-header">
+                            <span class="camera-name"></span>
+                            <span class="camera-type-badge usb">USB</span>
+                            <span class="latency-badge good">--ms</span>
+                        </div>
+                        <div class="camera-feed">
+                            <img class="stream-img" alt="Feed de cámara">
+                            <div class="camera-feed-overlay" style="display:none;">
+                                <img src="assets/icons/senal-off.svg" alt="">
+                                <span>Sin señal</span>
+                            </div>
+                        </div>
+                        <div class="camera-controls">
+                            <button class="btn-icon-only btn-fullscreen" title="Pantalla completa">
+                                <img src="assets/icons/expandir.svg" alt="">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado: Múltiples cámaras (grid) -->
+                <div id="camera-grid" class="camera-grid" style="display:none;">
+                    <!-- Se llena dinámicamente -->
+                </div>
+
+                <!-- Status bar -->
+                <div class="status-bar">
+                    <span id="cameras-count">0 cámaras conectadas</span>
+                    <span id="last-update">Última actualización: --</span>
+                </div>
             </div>
 
-            <!-- Upload Section -->
-            <div class="upload-section glass-container">
-                <h3>Procesamiento de Imágenes</h3>
-                <form id="vision-form">
-                    <div class="file-input-group">
-                        <input type="file" id="image-input" accept="image/*">
-                        <label for="image-input" class="file-label">
-                            <img src="assets/icons/documento.svg" class="input-icon" alt="Icono documento">
-                            <span>Seleccionar Imagen</span>
-                        </label>
-                        <span id="file-name" class="file-name"></span>
+            <!-- TAB: Captura -->
+            <div id="tab-captura" class="tab-panel" style="display:none;">
+                <div class="section-header">
+                    <h2>Captura de Imagen</h2>
+                </div>
+
+                <div class="capture-layout">
+                    <!-- Selector de cámara -->
+                    <div class="camera-selector glass-container">
+                        <label>Seleccionar Cámara:</label>
+                        <select id="capture-camera-select">
+                            <option value="">-- Seleccionar --</option>
+                        </select>
                     </div>
 
-                    <div class="select-group">
-                        <label for="operation-select">Tipo de Operación</label>
-                        <select id="operation-select">
+                    <!-- Vista en vivo -->
+                    <div class="live-view-container">
+                        <div class="live-view">
+                            <img id="capture-stream" class="stream-img" alt="Vista en vivo">
+                            <div class="live-view-overlay">
+                                <span class="live-badge">● EN VIVO</span>
+                            </div>
+                        </div>
+
+                        <!-- Controles -->
+                        <div class="capture-controls">
+                            <button id="btn-capture" class="btn-capture" disabled>
+                                <img src="assets/icons/captura.svg" class="btn-icon" alt="">
+                                Capturar
+                            </button>
+                            <button id="btn-process-capture" class="btn-primary" style="display:none;">
+                                <img src="assets/icons/procesar.svg" class="btn-icon" alt="">
+                                Procesar Captura
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Preview de captura -->
+                    <div id="capture-preview" class="capture-preview glass-container" style="display:none;">
+                        <h3>Vista Previa</h3>
+                        <img id="preview-img" alt="Captura">
+                        <div class="preview-actions">
+                            <button id="btn-save-capture" class="btn-secondary">Guardar</button>
+                            <button id="btn-discard-capture" class="btn-secondary">Descartar</button>
+                        </div>
+                    </div>
+
+                    <!-- Selector de operación de procesamiento -->
+                    <div class="process-options" style="display:none;" id="process-options">
+                        <label>Operación:</label>
+                        <select id="capture-operation">
                             <option value="deteccion">Detección</option>
                             <option value="clasificacion">Clasificación</option>
                             <option value="mejora">Mejora de Imagen</option>
                         </select>
                     </div>
 
-                    <button type="submit" id="btn-process" class="btn-primary">Procesar Imagen</button>
-                </form>
-            </div>
+                    <!-- Sección de procesamiento -->
+                    <div id="capture-processing" class="processing-section" style="display:none;">
+                        <div class="status-section">
+                            <p id="capture-task-status" class="task-status">Procesando...</p>
+                            <div class="progress-bar">
+                                <div id="capture-progress-fill" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Status Section -->
-            <div class="status-section glass-container">
-                <div id="task-status">Estado: Esperando imagen...</div>
-                <div id="progress-bar" class="progress-bar">
-                    <div id="progress-fill" class="progress-fill"></div>
+                    <!-- Resultado del procesamiento -->
+                    <div id="capture-result" class="result-section" style="display:none;">
+                        <h3>Resultado del Procesamiento</h3>
+                        <div class="result-content">
+                            <img id="capture-result-image" alt="Resultado">
+                            <div id="capture-result-details"></div>
+                        </div>
+                    </div>
+
+                    <!-- Galería recientes -->
+                    <div class="recent-gallery">
+                        <h3>Capturas Recientes</h3>
+                        <div id="gallery-grid" class="gallery-grid">
+                            <div class="empty-gallery">
+                                <img src="assets/icons/galeria.svg" class="empty-icon-sm" alt="">
+                                <p>Sin capturas recientes</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Result Section -->
-            <div class="result-section glass-container" id="result-section" style="display: none;">
-                <h3>Resultado</h3>
-                <div class="result-content">
-                    <img id="result-image" alt="Imagen procesada">
-                    <div id="result-info" class="result-info"></div>
+            <!-- TAB: Admin (solo si es admin) -->
+            <div id="tab-admin" class="tab-panel" style="display:none;">
+                <div class="section-header">
+                    <h2>Panel de Administración</h2>
+                </div>
+
+                <!-- Stats rápidos -->
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-users">--</span>
+                        <span class="stat-label">Usuarios</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-cameras">--</span>
+                        <span class="stat-label">Cámaras</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-online">--</span>
+                        <span class="stat-label">En Línea</span>
+                    </div>
+                </div>
+
+                <!-- Health del sistema -->
+                <div class="admin-health-section glass-container">
+                    <h3>Estado del Sistema</h3>
+                    <div id="system-health" class="system-health">
+                        <div class="health-item">
+                            <span class="health-label">Estado:</span>
+                            <span class="health-value">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link a admin -->
+                <div class="admin-link-card">
+                    <img src="assets/icons/escudo.svg" class="admin-link-icon" alt="">
+                    <div>
+                        <h3>Gestión de Usuarios</h3>
+                        <p>Administrar usuarios, roles y permisos del sistema</p>
+                    </div>
+                    <a href="/admin.html" class="btn-primary">Ir al Panel</a>
+                </div>
+
+                <!-- Gestión de cámaras (admin) -->
+                <div class="admin-cameras-section glass-container">
+                    <h3>Gestión de Cámaras</h3>
+                    <div class="admin-cameras-actions">
+                        <button id="btn-add-camera" class="btn-secondary">Agregar Cámara IP/ESP32</button>
+                        <button id="btn-scan-esp32" class="btn-secondary">Escanear ESP32</button>
+                    </div>
+                    <div id="admin-cameras-list" class="admin-cameras-list">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Formulario agregar cámara (oculto) -->
+                <div id="add-camera-form" class="glass-container" style="display:none;">
+                    <h3>Agregar Nueva Cámara</h3>
+                    <form id="camera-form">
+                        <div class="form-group">
+                            <label>Tipo de Cámara:</label>
+                            <select id="new-camera-type" required>
+                                <option value="ip">Cámara IP</option>
+                                <option value="esp32">ESP32-CAM</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre:</label>
+                            <input type="text" id="new-camera-name" required placeholder="Ej: Cámara Entrada">
+                        </div>
+                        <div class="form-group" id="fg-url">
+                            <label>URL del Stream:</label>
+                            <input type="text" id="new-camera-url" placeholder="http://192.168.1.100:8080/video">
+                        </div>
+                        <div class="form-group" id="fg-ip" style="display:none;">
+                            <label>Dirección IP:</label>
+                            <input type="text" id="new-camera-ip" placeholder="192.168.1.50">
+                        </div>
+                        <div class="form-group" id="fg-port" style="display:none;">
+                            <label>Puerto:</label>
+                            <input type="number" id="new-camera-port" value="80">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Registrar</button>
+                            <button type="button" id="btn-cancel-camera" class="btn-secondary">Cancelar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </main>
 
-        <!-- Toast Container -->
-        <div id="toast-container" class="toast-container"></div>
+            <!-- TAB: Ajustes (solo si es admin) -->
+            <div id="tab-ajustes" class="tab-panel" style="display:none;">
+                <div class="section-header">
+                    <h2>Ajustes de Visión</h2>
+                </div>
+
+                <p class="settings-intro">
+                    Configura la integración con Roboflow. Estos valores se aplican a todo el sistema y
+                    los motores de las cámaras activas se recargan automáticamente al guardar.
+                </p>
+
+                <!-- Indicador de estado de conexión -->
+                <div class="settings-connection-status" id="vision-conn-status" style="display:none;">
+                    <span class="conn-dot"></span>
+                    <span class="conn-text">—</span>
+                </div>
+
+                <div class="settings-panel glass-container">
+                    <form id="vision-settings-form" autocomplete="off">
+                        <div class="settings-grid">
+                            <!-- Modo de visión por defecto -->
+                            <div class="form-group">
+                                <label for="setting-default-mode">Modo de Visión por Defecto</label>
+                                <select id="setting-default-mode">
+                                    <option value="off">Apagado</option>
+                                    <option value="cloud">Nube (Cloud)</option>
+                                    <option value="local">Local</option>
+                                </select>
+                                <span class="form-hint">Cómo se procesan las imágenes al activar visión en una cámara.</span>
+                            </div>
+
+                            <!-- API Key -->
+                            <div class="form-group">
+                                <label for="setting-api-key">API Key de Roboflow</label>
+                                <div class="input-with-action">
+                                    <input type="password" id="setting-api-key" placeholder="No configurada" autocomplete="new-password">
+                                    <button type="button" class="btn-toggle-pass" id="btn-toggle-apikey" title="Mostrar / ocultar">👁️</button>
+                                </div>
+                                <span class="form-hint" id="apikey-hint">Déjalo vacío para mantener la clave actual.</span>
+                            </div>
+
+                            <!-- URL de la API -->
+                            <div class="form-group">
+                                <label for="setting-api-url">URL de la API</label>
+                                <input type="text" id="setting-api-url" placeholder="https://serverless.roboflow.com">
+                            </div>
+
+                            <!-- Workspace -->
+                            <div class="form-group">
+                                <label for="setting-workspace">Workspace</label>
+                                <input type="text" id="setting-workspace" placeholder="mi-workspace">
+                            </div>
+
+                            <!-- Workflow ID -->
+                            <div class="form-group">
+                                <label for="setting-workflow-id">Workflow ID</label>
+                                <input type="text" id="setting-workflow-id" placeholder="custom-workflow-1">
+                            </div>
+
+                            <!-- Image Input Name -->
+                            <div class="form-group">
+                                <label for="setting-image-input">Image Input Name</label>
+                                <input type="text" id="setting-image-input" placeholder="image">
+                            </div>
+
+                            <!-- Model ID (opcional) -->
+                            <div class="form-group">
+                                <label for="setting-model-id">Model ID <span class="opt-tag">(opcional)</span></label>
+                                <input type="text" id="setting-model-id" placeholder="solo si no usas workflows">
+                                <span class="form-hint">Se ignora cuando hay un Workflow ID configurado.</span>
+                            </div>
+                        </div>
+
+                        <!-- Toggles -->
+                        <div class="settings-toggles">
+                            <label class="toggle-row">
+                                <span class="toggle-text">
+                                    <strong>Usar caché de inferencia</strong>
+                                    <small>Acelera las respuestas repetidas en Roboflow.</small>
+                                </span>
+                                <span class="toggle-switch">
+                                    <input type="checkbox" id="setting-use-cache">
+                                    <span class="toggle-slider"></span>
+                                </span>
+                            </label>
+
+                            <label class="toggle-row">
+                                <span class="toggle-text">
+                                    <strong>Overlay del servidor</strong>
+                                    <small>Usar la imagen anotada que devuelve Roboflow (ahorra CPU local).</small>
+                                </span>
+                                <span class="toggle-switch">
+                                    <input type="checkbox" id="setting-use-overlay">
+                                    <span class="toggle-slider"></span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="settings-actions">
+                            <button type="button" id="btn-save-vision" class="btn-primary">Guardar cambios</button>
+                            <button type="button" id="btn-test-vision" class="btn-secondary">Probar conexión</button>
+                            <button type="button" id="btn-reset-vision" class="btn-secondary">Restablecer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+    <!-- Modal pantalla completa -->
+    <div id="fullscreen-modal" class="fullscreen-modal" style="display:none;">
+        <div class="fullscreen-header">
+            <span id="fullscreen-camera-name"></span>
+            <button id="btn-close-fullscreen" class="btn-icon-only">
+                <img src="assets/icons/contraer.svg" alt="">
+            </button>
+        </div>
+        <img id="fullscreen-stream" class="fullscreen-img" alt="">
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
 
     <!-- Scripts -->
     <script src="js/toast.js?v=20260505b"></script>
     <script src="js/auth2.js"></script>
     <script src="js/vision.js"></script>
+    <script src="js/dashboard.js?v=20260615"></script>
+    <script src="js/camera.js?v=20260615"></script>
+    <script src="js/settings.js?v=20260615"></script>
 
     <!-- Service Worker Registration -->
     <script>

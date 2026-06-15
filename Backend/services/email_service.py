@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 # Cargar variables de entorno desde .env
 load_dotenv()
 
-# Configuración de correo
+# Configuración de correo (leída desde variables de entorno, ver archivo .env)
 EMAIL_FROM = os.environ.get('EMAIL_FROM')
 EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_SMTP = os.environ.get('EMAIL_SMTP', 'smtp.gmail.com')

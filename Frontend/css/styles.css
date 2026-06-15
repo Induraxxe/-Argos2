@@ -323,7 +323,7 @@ body {
     font-size: 14px;
     font-weight: 500;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+    animation: slideUp 0.3s ease-out, fadeOut 0.3s ease 2.7s;
     max-width: 350px;
     display: flex;
     align-items: center;
@@ -1898,5 +1898,1927 @@ body:has(.admin-container) {
         font-size: 13px;
         padding: 14px 16px;
         border-radius: 10px;
+    }
+}
+
+/* ============================================
+   DASHBOARD TABS
+   ============================================ */
+.dashboard-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    margin: 0 24px;
+    border-radius: 16px;
+}
+
+.tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
+}
+
+.tab-btn.active {
+    background: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: 0 4px 12px rgba(106, 27, 154, 0.4);
+}
+
+.tab-btn.tab-admin {
+    /* Igual que los demás, solo se muestra si es admin */
+}
+
+.tab-content {
+    flex: 1;
+    padding: 0 24px 24px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.tab-panel {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   SECTION HEADER
+   ============================================ */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   BUTTONS - Secondary & Icon
+   ============================================ */
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--color-text);
+    color: var(--color-text);
+}
+
+.btn-secondary .btn-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-icon-only {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.btn-icon-only:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon-only img {
+    width: 18px;
+    height: 18px;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    gap: 12px;
+}
+
+.empty-icon {
+    width: 64px;
+    height: 64px;
+    opacity: 0.4;
+    margin-bottom: 8px;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+/* ============================================
+   CAMERA GRID - MONITOREO
+   ============================================ */
+.single-camera-view {
+    width: 100%;
+}
+
+.single-camera-view .camera-card.single {
+    max-width: 100%;
+}
+
+.camera-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.camera-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.camera-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 20px rgba(106, 27, 154, 0.3);
+    transform: translateY(-2px);
+}
+
+.camera-card .camera-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.3);
+    gap: 8px;
+}
+
+.camera-card .camera-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.camera-card .camera-feed {
+    aspect-ratio: 16 / 9;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.camera-card .camera-feed img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-card .camera-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.2);
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+/* Camera feed overlay - Sin señal */
+.camera-feed-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 5;
+}
+
+.camera-feed-overlay img {
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+}
+
+/* ============================================
+   VISION CONTROL — Segmented Control (Off/Cloud/Local)
+   Control segmentado para seleccionar el modo de visión IA.
+   ============================================ */
+.vision-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.vision-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.vision-segments {
+    display: inline-flex;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.vision-segment {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.vision-segment:hover:not(.active):not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text);
+}
+
+/* Accesibilidad por teclado: foco visible claro y consistente */
+.vision-segment:focus-visible {
+    outline: 2px solid var(--color-primary, #6A1B9A);
+    outline-offset: 1px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Énfasis tipográfico del segmento activo (sin alterar el layout) */
+.vision-segment.active {
+    font-weight: 700;
+}
+
+.vision-segment:disabled,
+.vision-segment.unavailable {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Estado activo por modo (gris=off, azul=cloud, verde=local) */
+.vision-segment.active.off {
+    background: rgba(158, 158, 158, 0.25);
+    color: #E0E0E0;
+}
+
+.vision-segment.active.cloud {
+    background: rgba(33, 150, 243, 0.3);
+    color: #64B5F6;
+    box-shadow: 0 0 8px rgba(33, 150, 243, 0.3);
+}
+
+.vision-segment.active.local {
+    background: rgba(76, 175, 80, 0.3);
+    color: #81C784;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Estado de carga (petición al backend en curso) */
+.vision-segment.loading {
+    animation: vision-pulse 1s ease-in-out infinite;
+    cursor: wait;
+}
+
+@keyframes vision-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Responsive: ocultar etiqueta en pantallas pequeñas */
+@media (max-width: 480px) {
+    .vision-label {
+        display: none;
+    }
+    .vision-segment {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+}
+
+/* Responsive: en tarjetas muy angostas el control de visión ocupa toda la
+   fila y el botón de pantalla completa baja a la siguiente línea. */
+@media (max-width: 380px) {
+    .camera-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .vision-control {
+        justify-content: center;
+    }
+}
+/* ============================================
+   CAMERA TYPE BADGE
+   ============================================ */
+.camera-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.camera-type-badge.usb {
+    background: rgba(33, 150, 243, 0.2);
+    color: #64B5F6;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.camera-type-badge.ip {
+    background: rgba(156, 39, 176, 0.2);
+    color: #CE93D8;
+    border: 1px solid rgba(156, 39, 176, 0.3);
+}
+
+.camera-type-badge.esp32 {
+    background: rgba(255, 152, 0, 0.2);
+    color: #FFB74D;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+/* ============================================
+   LATENCY BADGE
+   ============================================ */
+.latency-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    backdrop-filter: blur(4px);
+}
+
+.latency-badge.good {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.latency-badge.medium {
+    background: rgba(255, 152, 0, 0.2);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.latency-badge.bad {
+    background: rgba(244, 67, 54, 0.2);
+    color: #F44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+/* ============================================
+   STATUS BAR
+   ============================================ */
+.status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ============================================
+   CAPTURA DE IMAGEN
+   ============================================ */
+.capture-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.camera-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 16px;
+}
+
+.camera-selector label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+.camera-selector select {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text);
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.camera-selector select option {
+    background: #1a1a2e;
+    color: var(--color-text);
+}
+
+.camera-selector select:focus {
+    border-color: var(--color-primary);
+}
+
+.live-view-container {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.live-view {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-height: 500px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.live-view .stream-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.live-view-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 14px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.live-badge {
+    color: #f44336;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.capture-controls {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.btn-capture {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: none;
+    background: var(--color-primary);
+    color: var(--color-text);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-capture:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(106, 27, 154, 0.6);
+}
+
+.btn-capture:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.btn-capture:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-capture .btn-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-primary .btn-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* ============================================
+   CAPTURE PREVIEW
+   ============================================ */
+.capture-preview {
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.capture-preview h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.capture-preview img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 12px;
+    object-fit: contain;
+    border: 1px solid var(--glass-border);
+    margin-bottom: 12px;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* ============================================
+   GALLERY
+   ============================================ */
+.recent-gallery h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gallery-grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-behavior: smooth;
+}
+
+.gallery-grid::-webkit-scrollbar {
+    height: 6px;
+}
+
+.gallery-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.gallery-grid::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 3px;
+}
+
+.gallery-item {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gallery-item:hover {
+    border-color: var(--color-primary);
+    transform: scale(1.05);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.empty-gallery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    width: 100%;
+    justify-content: center;
+}
+
+.empty-icon-sm {
+    width: 32px;
+    height: 32px;
+    opacity: 0.4;
+}
+
+.empty-gallery p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.gallery-item-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 4px 6px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    pointer-events: none;
+}
+
+.gallery-item-camera {
+    font-size: 10px;
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gallery-item-time {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.gallery-item-actions {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.gallery-item:hover .gallery-item-actions {
+    opacity: 1;
+}
+
+.btn-gallery-process,
+.btn-gallery-delete {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    padding: 0;
+    transition: background 0.2s ease;
+}
+
+.btn-gallery-process img {
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) invert(1);
+}
+
+.btn-gallery-process:hover {
+    background: var(--color-primary);
+}
+
+.btn-gallery-delete:hover {
+    background: #e53935;
+}
+
+/* ============================================
+   PROCESS OPTIONS (Capture Tab)
+   ============================================ */
+.process-options {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.process-options label {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.process-options select {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.process-options select:focus {
+    border-color: var(--color-primary);
+}
+
+.process-options select option {
+    background: #1a1a2e;
+    color: var(--color-text);
+}
+
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+
+.stat-card .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.stat-card .stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-secondary);
+}
+
+.admin-link-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid var(--color-primary);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s ease;
+}
+
+.admin-link-card:hover {
+    background: rgba(106, 27, 154, 0.2);
+    box-shadow: 0 4px 20px rgba(106, 27, 154, 0.4);
+    transform: translateY(-2px);
+}
+
+.admin-link-card .admin-link-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.admin-link-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+.admin-link-card p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.admin-link-card .btn-primary {
+    width: auto;
+    padding: 10px 24px;
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.admin-cameras-section {
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.admin-cameras-section h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 16px;
+}
+
+.admin-cameras-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.admin-cameras-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-camera-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    gap: 12px;
+}
+
+.admin-camera-item .camera-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-camera-item .camera-info span {
+    font-size: 14px;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-camera-item .camera-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   ADD CAMERA FORM
+   ============================================ */
+#add-camera-form {
+    padding: 24px;
+    border-radius: 16px;
+}
+
+#add-camera-form h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 16px;
+}
+
+#add-camera-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+#add-camera-form label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#add-camera-form input,
+#add-camera-form select {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+#add-camera-form input:focus,
+#add-camera-form select:focus {
+    border-color: var(--color-primary);
+}
+
+#add-camera-form input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+#add-camera-form select option {
+    background: #1a1a2e;
+    color: var(--color-text);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.form-actions .btn-primary,
+.form-actions .btn-secondary {
+    width: auto;
+    padding: 10px 24px;
+    font-size: 14px;
+}
+
+/* ============================================
+   FULLSCREEN MODAL
+   ============================================ */
+.fullscreen-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.fullscreen-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+    z-index: 1;
+}
+
+.fullscreen-header span {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.fullscreen-img {
+    max-width: 95vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes pulse-live {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(106, 27, 154, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(106, 27, 154, 0.6); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes flash-capture {
+    0% { opacity: 1; }
+    25% { opacity: 0.3; }
+    50% { opacity: 1; }
+    75% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Aplicar animaciones a elementos */
+.live-badge {
+    animation: pulse-live 2s ease-in-out infinite;
+}
+
+.camera-card.active {
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.tab-panel.active {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.toast {
+    animation: slideUp 0.3s ease-out, fadeOut 0.3s ease 2.7s;
+}
+
+/* Flash overlay para captura */
+.flash-overlay {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    border-radius: inherit;
+}
+
+.flash-overlay.flash {
+    animation: flash-capture 0.4s ease-out;
+}
+
+/* Clase utilitaria para animar entrada */
+.animate-in {
+    animation: slideUp 0.4s ease forwards;
+}
+
+/* Delay escalonado para grid items */
+.camera-card:nth-child(1) { animation-delay: 0s; }
+.camera-card:nth-child(2) { animation-delay: 0.1s; }
+.camera-card:nth-child(3) { animation-delay: 0.2s; }
+.camera-card:nth-child(4) { animation-delay: 0.3s; }
+.camera-card:nth-child(5) { animation-delay: 0.4s; }
+.camera-card:nth-child(6) { animation-delay: 0.5s; }
+
+/* Loading spinner */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 12px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+.loading-spinner::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--glass-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Skeleton loader */
+.skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-card {
+    height: 220px;
+    border-radius: 16px;
+}
+
+/* ============================================
+   RESPONSIVE - Dashboard Tabs & Grid
+   ============================================ */
+@media (max-width: 768px) {
+    /* Tabs: solo iconos */
+    .dashboard-tabs {
+        margin: 0 16px;
+    }
+
+    .tab-btn {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .tab-btn span {
+        display: none;
+    }
+
+    .tab-btn .tab-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .tab-content {
+        padding: 0 16px 16px;
+    }
+
+    /* Camera grid: máximo 2 columnas */
+    .camera-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .camera-grid.grid-3,
+    .camera-grid.grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Captura layout: stack vertical */
+    .capture-layout {
+        gap: 16px;
+    }
+
+    .live-view {
+        max-height: 300px;
+    }
+
+    /* Admin stats: 2 columnas */
+    .admin-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .admin-link-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .admin-link-card .btn-primary {
+        width: 100%;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Navbar compacta */
+    .navbar {
+        padding: 8px 12px;
+    }
+
+    .nav-brand span {
+        font-size: 12px;
+    }
+
+    /* Status bar */
+    .status-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Camera grid: 1 columna */
+    .camera-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .camera-grid.grid-2,
+    .camera-grid.grid-3,
+    .camera-grid.grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Tabs como barra inferior fija */
+    .dashboard-tabs {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        border-radius: 16px 16px 0 0;
+        z-index: 90;
+        padding: 8px;
+    }
+
+    .tab-content {
+        padding-bottom: 80px;
+    }
+
+    /* Fullscreen modal ocupa 100% */
+    .fullscreen-modal {
+        padding: 0;
+    }
+
+    .fullscreen-img {
+        max-width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .fullscreen-header {
+        padding: 12px 16px;
+    }
+
+    /* Galería: 2 columnas */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        overflow-x: visible;
+    }
+
+    .gallery-item {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    /* Admin cameras list: stack vertical */
+    .admin-camera-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .admin-camera-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .admin-camera-info {
+        flex-wrap: wrap;
+    }
+
+    /* Selector de cámara */
+    .camera-selector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-capture {
+        width: 100%;
+    }
+
+    .admin-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-cameras-actions {
+        flex-direction: column;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary {
+        width: 100%;
+    }
+
+    /* ESP32 results responsive */
+    .esp32-device {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .esp32-device .btn-register {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ============================================
+   ADMIN CAMERAS LIST
+   ============================================ */
+.admin-camera-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background 0.2s;
+}
+
+.admin-camera-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.admin-camera-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-camera-info .camera-name {
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+}
+
+.camera-status {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.camera-status.online {
+    color: var(--color-success, #388E3C);
+}
+
+.camera-status.offline {
+    color: var(--color-error, #D32F2F);
+}
+
+.admin-camera-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.admin-camera-actions .btn-icon-only {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--color-text-secondary, rgba(255,255,255,0.7));
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.admin-camera-actions .btn-icon-only:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary, #fff);
+}
+
+.admin-camera-actions .btn-delete-cam:hover {
+    background: rgba(244, 67, 54, 0.2);
+    color: var(--color-error, #D32F2F);
+    border-color: var(--color-error, #D32F2F);
+}
+
+.admin-empty-cameras {
+    text-align: center;
+    padding: 24px;
+    color: var(--color-text-secondary, rgba(255,255,255,0.7));
+    font-style: italic;
+}
+
+/* ============================================
+   ESP32 SCAN RESULTS
+   ============================================ */
+.esp32-results {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+}
+
+.esp32-device {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    transition: background 0.2s;
+}
+
+.esp32-device:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.esp32-device-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.esp32-device-name {
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+}
+
+.esp32-device-ip {
+    font-family: monospace;
+    color: var(--color-primary-hover, #8E24AA);
+    font-size: 0.9rem;
+}
+
+.esp32-device .btn-register {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    background: var(--color-primary, #6A1B9A);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.esp32-device .btn-register:hover {
+    background: var(--color-primary-hover, #8E24AA);
+}
+
+/* ============================================
+   SYSTEM HEALTH
+   ============================================ */
+.health-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.health-label {
+    color: var(--color-text-secondary, rgba(255,255,255,0.7));
+    font-size: 0.85rem;
+    min-width: 70px;
+}
+
+.health-value {
+    color: var(--text-primary, #fff);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.health-value.text-success {
+    color: var(--color-success, #388E3C);
+}
+
+.health-value.text-warning {
+    color: var(--color-warning, #F57C00);
+}
+
+/* ============================================
+   ADMIN HEALTH SECTION
+   ============================================ */
+.admin-health-section {
+    margin-top: 16px;
+    padding: 16px;
+}
+
+.admin-health-section h3 {
+    margin-bottom: 12px;
+    color: var(--text-primary, #fff);
+    font-size: 1rem;
+}
+
+.system-health {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ============================================
+   AJUSTES DE VISIÓN (Settings Panel)
+   ============================================ */
+.settings-intro {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Indicador de estado de conexión */
+.settings-connection-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--glass-border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.conn-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.settings-connection-status.ok {
+    border-color: rgba(76, 175, 80, 0.5);
+    color: #81C784;
+}
+
+.settings-connection-status.ok .conn-dot {
+    background: #4CAF50;
+    box-shadow: 0 0 8px #4CAF50;
+}
+
+.settings-connection-status.error {
+    border-color: rgba(244, 67, 54, 0.5);
+    color: #EF9A9A;
+}
+
+.settings-connection-status.error .conn-dot {
+    background: #F44336;
+    box-shadow: 0 0 8px #F44336;
+}
+
+.settings-connection-status.testing {
+    border-color: rgba(245, 124, 0, 0.5);
+    color: var(--color-warning);
+}
+
+.settings-connection-status.testing .conn-dot {
+    background: var(--color-warning);
+    animation: vision-pulse 0.8s ease-in-out infinite;
+}
+
+/* Panel principal */
+.settings-panel {
+    padding: 24px;
+}
+
+.settings-panel #vision-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Grid de campos a 2 columnas */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.settings-grid .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.settings-grid label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.settings-grid input,
+.settings-grid select {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+}
+
+.settings-grid input:focus,
+.settings-grid select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-focus);
+}
+
+.settings-grid input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.settings-grid select option {
+    background: #1a1a2e;
+    color: var(--color-text);
+}
+
+.form-hint {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.opt-tag {
+    text-transform: none;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+}
+
+/* Input con botón de acción (mostrar/ocultar API key) */
+.input-with-action {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-action input {
+    padding-right: 44px;
+}
+
+.btn-toggle-pass {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    line-height: 1;
+}
+
+.btn-toggle-pass:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Toggles (switches tipo iOS) */
+.settings-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    cursor: pointer;
+}
+
+.toggle-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.toggle-text strong {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.toggle-text small {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--glass-border);
+    border-radius: 26px;
+    transition: 0.3s;
+}
+
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+.toggle-switch input:focus-visible + .toggle-slider {
+    box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+/* Acciones (botones) */
+.settings-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.settings-actions .btn-primary,
+.settings-actions .btn-secondary {
+    width: auto;
+    padding: 12px 24px;
+    font-size: 14px;
+}
+
+/* Estados de carga en botones */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+.settings-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+/* Responsive - Ajustes de Visión */
+@media (max-width: 768px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-panel {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-actions {
+        flex-direction: column;
+    }
+
+    .settings-actions .btn-primary,
+    .settings-actions .btn-secondary {
+        width: 100%;
     }
 }

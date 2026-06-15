@@ -275,7 +275,37 @@ def init_database():
     conn.execute('CREATE INDEX IF NOT EXISTS idx_logs_componente ON logs_sistema(componente)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_logs_usuario ON logs_sistema(usuario_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_logs_trazabilidad ON logs_sistema(trazabilidad_id)')
-    
+
+    # Tabla de configuración genérica (clave-valor)
+    # Permite persistir ajustes del sistema (visión, etc.) y modificarlos en
+    # runtime sin reiniciar ni editar el .env. La DB es la fuente de verdad.
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Valores por defecto de las variables de visión.
+    # Se leen de os.environ como fallback para que la primera vez tome lo que
+    # haya en .env. INSERT OR IGNORE evita sobrescribir valores ya existentes.
+    _vision_defaults = [
+        ('vision_default_mode', os.environ.get('VISION_DEFAULT_MODE', 'off')),
+        ('roboflow_api_key', os.environ.get('ROBOFLOW_API_KEY', '')),
+        ('roboflow_api_url', os.environ.get('ROBOFLOW_API_URL', '')),
+        ('roboflow_workspace', os.environ.get('ROBOFLOW_WORKSPACE', '')),
+        ('roboflow_workflow_id', os.environ.get('ROBOFLOW_WORKFLOW_ID', '')),
+        ('roboflow_workflow_image_input', os.environ.get('ROBOFLOW_WORKFLOW_IMAGE_INPUT', 'image')),
+        ('roboflow_workflow_use_cache', os.environ.get('ROBOFLOW_WORKFLOW_USE_CACHE', 'true')),
+        ('roboflow_use_server_overlay', os.environ.get('ROBOFLOW_USE_SERVER_OVERLAY', 'false')),
+        ('roboflow_model_id', os.environ.get('ROBOFLOW_MODEL_ID', '')),
+    ]
+    conn.executemany(
+        'INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)',
+        _vision_defaults,
+    )
+
     conn.close()
     print("Base de datos inicializada con WAL mode habilitado.")
 

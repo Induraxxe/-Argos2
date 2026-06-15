@@ -6,8 +6,10 @@ Contiene los blueprints de Flask para los diferentes endpoints.
 from .auth import auth_bp
 from .admin import admin_bp
 from .vision import vision_bp
+from .camera import camera_bp
+from .settings import settings_bp
 
-__all__ = ['auth_bp', 'admin_bp', 'vision_bp']
+__all__ = ['auth_bp', 'admin_bp', 'vision_bp', 'camera_bp', 'settings_bp']
 
 
 # =====================

@@ -14,3 +14,21 @@ typing_extensions==4.15.0
 Werkzeug==3.1.8
 python-dotenv==1.1.0
 Flask-Limiter>=3.12
+requests>=2.31.0
+
+# ============================
+# Visión Computacional
+# ============================
+# Opción 2 (Cloud) — inferencia en la nube de Roboflow vía HTTP REST.
+inference-sdk
+
+# Opción 3 (Local/Edge) — inferencia local con el paquete `inference`.
+# NOTA: es una dependencia PESADA (arrastra torch/onnxruntime, ~2 GB).
+# Por eso se deja comentada por defecto. Instalar SOLO si se usa modo local:
+#   pip install inference
+# inference
+# torch
+# onnxruntime
+#
+# pytest — framework de pruebas (necesario para Backend/tests/).
+pytest

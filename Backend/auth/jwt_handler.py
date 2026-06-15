@@ -239,6 +239,10 @@ def token_required(f: Callable) -> Callable:
                     'code': 'TOKEN_FORMAT_ERROR'
                 }), 401
         
+        # Fallback: buscar token en query parameter (para streams MJPEG via <img>)
+        if not token:
+            token = request.args.get('token')
+        
         if not token:
             return jsonify({
                 'error': 'Token de autenticación requerido',

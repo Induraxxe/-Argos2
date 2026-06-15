@@ -77,7 +77,7 @@
                 // El rol puede estar en session.rol (mock) o session.user.rol (backend)
                 const rol = session.user ? session.user.rol : session.rol;
                 if (rol === 'admin') {
-                    window.location.href = 'admin.html';
+                    window.location.href = 'dashboard.html';
                 } else {
                     window.location.href = 'dashboard.html';
                 }
@@ -134,7 +134,7 @@
                             // El rol puede estar en result.rol (mock) o result.user.rol (backend)
                             const rol = result.user ? result.user.rol : result.rol;
                             if (rol === 'admin') {
-                                window.location.href = 'admin.html';
+                                window.location.href = 'dashboard.html';
                             } else {
                                 window.location.href = 'dashboard.html';
                             }
