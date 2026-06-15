@@ -42,6 +42,9 @@ Backend/argos2.db
 Thumbs.db
 Desktop.ini
 
+# Archivos temporales de bloqueo de Office (Excel/Word/...)
+~$*
+
 # Archivos subidos y procesados (datos de usuario)
 Backend/uploads/*
 Backend/processed/*

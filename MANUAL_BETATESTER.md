@@ -1,360 +1,380 @@
-# 🧪 Manual del Betatester - Argos2
+# 🧪 Manual del Betatester — Argos2
 
-## 📋 Información General
+> **Versión:** 2.0 · **Fecha:** Junio 2026
+> **Servidor local:** http://localhost:5000
+> **Contacto:** sqprpject@gmail.com
 
-**Sistema:** Argos2 - Sistema de Visión Computacional con Autenticación  
-**Versión:** Beta  
-**Servidor:** http://localhost:5000  
-**Fecha:** Mayo 2026  
+¡Gracias por participar como betatester de **Argos2**! 🎉 Este manual te guía, paso a paso, por todo lo que tienes que instalar, probar y reportar. No necesitas saber programar: si sigues las instrucciones y anotas lo que encuentras, nos ayudas muchísimo.
 
 ---
 
-## 🚀 Paso 1: Instalación
+## 📋 1. Información General
 
-### Windows
-1. Doble clic en `install.bat`
-2. Seguir las instrucciones en pantalla
-3. Seleccionar opción **[2]** para iniciar y abrir el navegador automáticamente
+### ¿Qué es Argos2?
+**Argos2** es un **Sistema de Visión Computacional con Autenticación**. En palabras sencillas, es una aplicación que:
 
-### Linux
+- Permite **iniciar sesión** de forma segura (con verificación por correo electrónico).
+- Conecta **una o varias cámaras** (webcams USB, cámaras IP y placas ESP32-CAM) y las muestra en un panel.
+- Puede **"ver"** lo que ocurre en esas cámaras usando un **motor de visión** (detección de objetos en la nube o en local).
+- Permite **tomar fotos**, revisarlas en una galería y **gestionar usuarios y cámaras** desde un panel de administración.
+
+### Perfil del betatester
+- **No necesitas ser técnico.** Si sabes abrir un navegador, instalar un programa y seguir pasos, puedes hacerlo.
+- Tu trabajo es **usar la aplicación como lo haría un usuario real** y **reportar todo lo que no funcione bien**, esté roto, se vea feo o resulte confuso.
+- No pasa nada si "rompes" algo: para eso es el betatest. Anótalo y sigue adelante.
+
+### ¿Qué se espera de ti y cuánto dura?
+- **Duración estimada:** 1 a 2 semanas, a tu ritmo.
+- **Lo que esperamos:**
+  1. Que instales y pongas en marcha Argos2.
+  2. Que recorras las funcionalidades del **Plan de Pruebas** (sección 5).
+  3. Que rellenes la **Ficha de Reporte** [`Ficha_Betatester.xlsx`](Ficha_Betatester.xlsx) por cada problema u observación.
+  4. Que nos envíes la ficha por correo al terminar.
+
+---
+
+## 🚀 2. Preparación / Instalación
+
+### Requisitos previos
+- **Python 3.8** o superior instalado en tu equipo (descárgalo de <https://www.python.org/downloads/>). Al instalarlo, marca la casilla *"Add Python to PATH"*.
+- **Conexión a internet** (para descargar las dependencias la primera vez y para el correo y el motor de visión en la nube).
+- **Cámara USB opcional** (sirve una webcam cualquiera para probar el descubrimiento de cámaras; si no tienes, podrás probar igualmente con cámaras IP).
+
+> 💡 **Buenas noticias:** el instalador **crea el entorno virtual, instala todas las dependencias y configura automáticamente las variables de entorno** (incluyendo el correo de la empresa). **No tienes que editar el archivo `.env` a mano.**
+
+### En Windows
+1. Localiza el archivo [`install.bat`](install.bat:1) en la carpeta del proyecto.
+2. Haz **doble clic** sobre él (o ejecútalo en una terminal).
+3. Sigue las instrucciones que aparezcan en pantalla. El proceso descargará e instalará todo lo necesario.
+4. Cuando termine, **ejecuta `start.bat`** (doble clic) para arrancar el servidor y abrir el navegador en http://localhost:5000.
+
+```bat
+start.bat
+```
+
+### En Linux
 ```bash
 chmod +x install.sh
 ./install.sh
 ```
-Seleccionar opción **[2]** para iniciar y abrir el navegador.
+Sigue las instrucciones en pantalla. Cuando termine, arranca el servidor con:
 
-### Inicio Rápido (ya instalado)
-- **Windows:** Doble clic en `start.bat`
+```bash
+./start.sh
+```
+
+### Inicio rápido (si ya está instalado)
+- **Windows:** doble clic en [`start.bat`](start.bat:1).
 - **Linux:** `./start.sh`
 
-> ⚠️ **Requisito:** Python 3.8 o superior debe estar instalado en el equipo.
+### Verificar que todo está en marcha
+1. Al arrancar, se abrirá (o puedes abrir) el navegador en **http://localhost:5000**.
+2. Debes ver la pantalla de **inicio de sesión** de Argos2.
+3. Si la página no carga, revisa que la terminal del servidor no muestre errores y vuelve a intentarlo.
+
+> ⚠️ **Importante:** Argos2 se ejecuta **en tu propio equipo** (`localhost`). Para que el correo de verificación llegue, tu equipo debe tener conexión a internet.
 
 ---
 
-## 📊 Mapa de Funcionalidades a Probar
+## 🗺️ 3. Mapa de Funcionalidades
+
+Este diagrama muestra todos los módulos que componen Argos2. En la sección 5 encontrarás cómo probar cada uno.
 
 ```mermaid
 flowchart TD
-    A[Inicio: Login] --> B{Credenciales}
-    B -->|Nuevo usuario| C[Registro]
-    C --> D[Verificacion de Email]
-    D -->|Codigo correcto| E{Rol}
-    B -->|Usuario existente| E
-    E -->|Admin| F[Panel Admin]
-    E -->|Usuario| G[Dashboard Vision]
-    F --> F1[Ver usuarios]
-    F --> F2[Cambiar rol]
-    F --> F3[Activar/Desactivar]
-    F --> F4[Eliminar usuario]
-    G --> G1[Subir imagen]
-    G --> G2[Procesar imagen]
-    A --> H[Recuperar contraseña]
-    H --> I[Recibir codigo]
-    I --> J[Nueva contraseña]
+    A[Inicio de Sesión] --> B{¿Tienes cuenta?}
+    B -->|No| C[Registro + Verificación por Correo]
+    B -->|Sí| D[Login JWT]
+    C --> D
+    D --> E{Rol del usuario}
+
+    E -->|Usuario estándar| F[Dashboard]
+    E -->|Administrador| G[Panel de Administración]
+    E -->|Administrador| H[Panel de Ajustes]
+
+    F --> F1[Monitoreo en Vivo - Grid de Cámaras]
+    F --> F2[Captura de Fotos + Galería]
+    F --> F3[Selector de Visión por Cámara]
+
+    F1 --> V[Motor de Visión]
+    F3 --> V
+    V -->|Off| V1[Solo video]
+    V -->|Cloud| V2[Roboflow - Bounding boxes]
+    V -->|Local| V3[Procesamiento en el equipo]
+
+    G --> G1[Gestión de Usuarios - Rol/Estado]
+    G --> G2[Gestión de Cámaras - Reiniciar/Eliminar]
+    G --> G3[Escanear ESP32 en red]
+    G --> G4[Salud del Sistema]
+
+    H --> H1[API key de Visión enmascarada]
+    H --> H2[Probar conexión]
+    H --> H3[Modo por defecto]
+
+    CAM[Cámaras: USB / IP / ESP32] --> F1
+    CAM --> G2
+
+    AUTH[Seguridad / Rate Limiting] -.-> D
+    PWA[PWA: Instalable + Offline] -.-> F
 ```
 
 ---
 
-## 🧪 Plan de Pruebas
+## 🔑 4. Cuentas de Prueba / Accesos
 
-### PRUEBA 1: Registro de Nuevo Usuario
+### Tu primera cuenta
+Argos2 no trae credenciales prefabricadas: **tú mismo te registras** la primera vez.
 
-**Objetivo:** Verificar que un usuario nuevo puede registrarse correctamente.
+1. En la pantalla de inicio, pulsa **REGISTRAR**.
+2. Completa el formulario con tus datos reales (usa un **correo válido**, porque te llegará un código de verificación).
+3. Verifica el correo con el código de 6 dígitos.
+4. Inicia sesión con tu nuevo usuario.
 
-**Pasos:**
-1. Abrir http://localhost:5000
-2. Clic en el botón **REGISTRAR**
-3. Completar el formulario con:
-   - **Usuario:** betatester1
-   - **Correo:** tu-correo-real@gmail.com *(usar correo real para recibir el código)*
-   - **Contraseña:** Test1234 *(mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número)*
-   - **Nombre Completo:** Tu Nombre
-   - **Fecha de Nacimiento:** cualquier fecha válida
-   - **Tipo de Documento:** V
-   - **Número de Documento:** 12345678
-   - **Teléfono:** 04141234567 *(opcional)*
-4. Clic en **REGISTRAR**
+### Rol administrador
+Para probar **cámaras IP, ajustes de visión y el panel de administración**, necesitas un usuario con rol **admin**.
 
-**Resultado esperado:**
-- ✅ Se redirige a la página de verificación de correo
-- ✅ Se muestra el correo ingresado en pantalla
-- ✅ Llega un correo con código de 6 dígitos
+- El **primer usuario** que se registra puede ser definido como administrador durante la configuración, o bien el responsable del betatest te indicará qué usuario tiene rol admin.
+- Si el responsable te entrega unas credenciales de demo (usuario + contraseña), úsalas tal cual y **no las cambies**.
+- Si **no te indican credenciales de admin**, regístrate y solicita el rol de administrador al contacto (sección 8).
 
-**⚠️ Nota importante sobre el correo:**  
-El sistema envía correos reales usando SMTP de Gmail. Si no recibes el código:
-- Revisa la carpeta de **Spam** o **Correo no deseado**
-- El código expira en **2 minutos**
-- Puedes usar el enlace **Reenviar código** después del countdown
+### Reglas de las contraseñas
+La contraseña debe tener **mínimo 8 caracteres**, incluyendo **1 mayúscula, 1 minúscula y 1 número** (y se requiere al menos **1 carácter especial**). Ejemplo válido: `Prueba$123`.
 
 ---
 
-### PRUEBA 2: Verificación de Correo
+## 🧪 5. Plan de Pruebas por Módulo
 
-**Objetivo:** Verificar que el código de verificación funciona correctamente.
+Recorre estas **12 categorías** en orden. Para cada una: lee el "qué es", ejecuta los pasos numerados y anota los resultados. Si algo falla o se ve raro, **abre una fila en la Ficha de Reporte** (sección 6).
 
-**Pasos:**
-1. Revisar el correo electrónico
-2. Ingresar el código de 6 dígitos en los campos individuales
-3. Clic en **VERIFICAR**
-
-**Resultado esperado:**
-- ✅ Mensaje de verificación exitosa
-- ✅ Redirección a la página de login
-
-**Casos adicionales a probar:**
-- ❌ Ingresar un código incorrecto (debe mostrar error)
-- ❌ Esperar más de 2 minutos e intentar usar el código (debe mostrar error de expiración)
-- ✅ Usar **Reenviar código** y verificar que llega un nuevo código
+> 💡 **Convención:** ✅ = resultado correcto esperado · ❌ = caso negativo que debe ser rechazado con un mensaje claro.
 
 ---
 
-### PRUEBA 3: Inicio de Sesión (Login)
+### 5.1 Descubrimiento y Registro de Cámaras (USB / IP / ESP32)
 
-**Objetivo:** Verificar que el login funciona correctamente.
+**Qué es:** La capacidad de detectar cámaras conectadas (USB) o de dar de alta cámaras remotas (IP/ESP32-CAM) para que aparezcan en el panel.
 
-**Pasos:**
-1. Ir a http://localhost:5000
-2. Ingresar **Usuario** y **Contraseña** del usuario registrado
-3. Clic en **INGRESAR**
-
-**Resultado esperado:**
-- ✅ Redirección al Dashboard (si es rol usuario) o Panel Admin (si es rol admin)
-- ✅ Se muestra el nombre de usuario en la barra superior
-- ✅ No hay errores en la consola del navegador (F12 > Console)
-
-**Casos adicionales a probar:**
-- ❌ Ingresar contraseña incorrecta (debe mostrar "Credenciales inválidas")
-- ❌ Ingresar usuario que no existe (debe mostrar "Credenciales inválidas")
-- ❌ Intentar login con cuenta no verificada (debe mostrar "Email no verificado")
+1. **(USB)** Conecta una webcam USB, pulsa **"Descubrir cámaras"** y verifica que se detecta y se autorregistra. ✅
+2. **(Admin)** Como administrador, registra una cámara **IP** con una URL MJPEG/RTSP válida y confirma que aparece en el grid de Monitoreo con **stream en vivo**. ✅
+3. **(Negativo)** Intenta registrar una cámara con una URL **inválida o inalcanzable** y verifica que se **rechaza con un mensaje claro** (la aplicación **no** debe caerse ni el servidor colgarse). ❌
+4. **(Persistencia)** Recarga la página y confirma que **las cámaras siguen ahí** (no se pierden). ✅
+5. **(Permisos)** Como usuario **no administrador**, intenta registrar una cámara y verifica que se **deniega el acceso** (código `403`). ❌
 
 ---
 
-### PRUEBA 4: Cierre de Sesión (Logout)
+### 5.2 Monitoreo en Vivo + Reconexión
 
-**Objetivo:** Verificar que el logout funciona correctamente.
+**Qué es:** La vista de cámaras en tiempo real y la capacidad de recuperarse cuando una cámara se cae.
 
-**Pasos:**
-1. Estar logueado en cualquier página
-2. Clic en **Cerrar Sesión** (esquina superior derecha)
-3. Verificar redirección al login
-
-**Resultado esperado:**
-- ✅ Se muestra mensaje de "Sesión cerrada exitosamente"
-- ✅ Redirección a la página de login
-- ✅ Al intentar navegar al dashboard, redirige al login
+1. Abre el dashboard con **al menos 1 cámara** y verifica que el video se ve **fluido, sin congelarse** de forma prolongada. ✅
+2. **(Caída)** Desconecta físicamente la cámara o corta la red; verifica que aparece un **indicador de error** y que, al reconectar, la cámara se **reconecta automáticamente**. ✅
+3. **(Multicámara)** Con **4 o más cámaras**, verifica que el grid las muestra **todas** y que el **estado y la latencia** se actualizan. ✅
+4. **(Admin)** Pulsa **"Reiniciar cámara"** y verifica que el stream **se reanuda sin recargar** la página. ✅
 
 ---
 
-### PRUEBA 5: Recuperación de Contraseña
+### 5.3 Captura de Fotos + Galería
 
-**Objetivo:** Verificar el flujo completo de recuperación de contraseña.
+**Qué es:** Tomar fotografías desde una cámara y revisarlas después en una galería.
 
-**Pasos:**
-1. Ir a http://localhost:5000
-2. Clic en **¿Olvidaste tu contraseña?**
-3. Ingresar el correo del usuario registrado
-4. Clic en **ENVIAR CÓDIGO**
-5. Revisar correo y obtener el código
-6. Ingresar el código de 6 dígitos
-7. Ingresar nueva contraseña (ej: NuevaPass123)
-8. Confirmar el cambio
-
-**Resultado esperado:**
-- ✅ Se envía código de recuperación al correo
-- ✅ Se puede cambiar la contraseña con el código
-- ✅ Se puede iniciar sesión con la nueva contraseña
+1. En la pestaña **Captura**, selecciona una cámara y pulsa **Capturar**; verifica que la foto aparece en la **previsualización**. ✅
+2. **Procesa** la captura y confirma que se obtiene un **resultado** y que la imagen **pasa a la galería**. ✅
+3. Toma **más de 12 capturas** y verifica que la galería **conserva solo las últimas** (comportamiento FIFO: las más antiguas se descartan). ✅
+4. Pulsa **Descargar** en un elemento de la galería y verifica que se **descarga el archivo JPG**. ✅
+5. **(Fallback)** Si la cámara no responde, verifica que el **fallback de canvas** genera una captura **utilizable** (no una imagen rota). ✅
 
 ---
 
-### PRUEBA 6: Panel de Administración
+### 5.4 Selector de Visión por Cámara (Off / Cloud / Local)
 
-**Objetivo:** Verificar las funciones del panel de administración.
+**Qué es:** El control que permite elegir, para cada cámara, si la detección está **apagada**, en la **nube** (Roboflow) o en **local**.
 
-> **⚠️ Nota:** Para probar esto necesitas un usuario con rol **admin**.  
-> Puedes crear un usuario admin directamente en la base de datos SQLite ejecutando:
-> ```sql
-> INSERT INTO usuarios (username, email, password_hash, nombre_completo, fecha_nacimiento, tipo_documento, numero_documento, rol, activo, email_verificado)
-> VALUES ('admin', 'admin@test.com', '$2b$12$hash', 'Admin Test', '1990-01-01', 'V', '10000000', 'admin', 1, 1);
-> ```
-
-**Pasos:**
-1. Iniciar sesión como admin
-2. Verificar que se redirige al Panel de Administración
-3. Verificar que se muestra la tabla de usuarios
-
-**Funciones a probar:**
-
-| Función | Pasos | Resultado Esperado |
-|---------|-------|--------------------|
-| **Ver usuarios** | La tabla se carga automáticamente | Lista de todos los usuarios con sus datos |
-| **Cambiar rol** | Clic en botón de rol de un usuario | El rol cambia entre admin y usuario |
-| **Activar/Desactivar** | Clic en botón de estado | El usuario se activa o desactiva |
-| **Eliminar usuario** | Clic en botón eliminar | El usuario se elimina de la lista |
-| **Actualizar lista** | Clic en **Actualizar Lista** | La tabla se refresca con datos actuales |
-
-**Casos adicionales a probar:**
-- ❌ Intentar cambiar el propio rol (debe mostrar error)
-- ❌ Intentar desactivar la propia cuenta (debe mostrar error)
-- ❌ Intentar eliminar la propia cuenta (debe mostrar error)
+1. Activa el modo **Cloud** (con la API key configurada) y verifica que aparecen **bounding boxes** (rectángulos) sobre las detecciones. ✅
+2. Cambia a **Off** y confirma que el stream **vuelve a video plano, sin anotaciones**. ✅
+3. Activa **Local** por primera vez y verifica que aparece la **advertencia de consumo de recursos**. ✅
+4. **Recarga** la página y verifica que la **selección de visión persiste por cámara** (cada cámara recuerda su modo). ✅
+5. **(Negativo)** Con la API key **ausente**, activa Cloud y verifica que aparece un **mensaje de error** (la aplicación **no** debe cerrarse). ❌
 
 ---
 
-### PRUEBA 7: Dashboard de Visión Computacional
+### 5.5 Motor de Visión (Cloud Roboflow + Local)
 
-**Objetivo:** Verificar la interfaz del dashboard de procesamiento de imágenes.
+**Qué es:** El "cerebro" que analiza las imágenes y dibuja las detecciones.
 
-**Pasos:**
-1. Iniciar sesión como usuario normal (rol usuario)
-2. Verificar que se redirige al Dashboard
-3. Verificar los elementos visibles:
-   - Barra de navegación con nombre de usuario
-   - Sección de bienvenida
-   - Formulario de subida de imagen
-   - Selector de tipo de operación (Detección, Clasificación, Mejora)
-   - Barra de progreso
-   - Área de resultados
-
-**⚠️ Nota:** El procesamiento de imágenes puede no estar completamente funcional aún.  
-Probar lo siguiente:
-- ✅ Se puede seleccionar un archivo de imagen
-- ✅ Se puede seleccionar tipo de operación
-- ✅ Al enviar, se muestra algún tipo de respuesta (procesando, error, o resultado)
+1. Con **workflow** activo y `use_server_overlay=true`, verifica que el frame **trae las anotaciones desde el servidor**. ✅
+2. Cambia al **modelo estándar** y verifica que las predicciones se dibujan con **colores y clases correctas** (cada tipo de objeto con su etiqueta). ✅
+3. **(Degradación)** Envía un **frame negro o vacío** y verifica que el sistema **degrada de forma elegante** (sin excepción ni caída). ✅
+4. Verifica que `GET /api/cameras/vision/modes` **devuelve solo los modos disponibles** (no modos inexistentes). ✅
 
 ---
 
-### PRUEBA 8: Sesiones y Seguridad
+### 5.6 Panel de Ajustes de Visión
 
-**Objetivo:** Verificar aspectos de seguridad del sistema.
+**Qué es:** Donde el administrador configura la API key de Roboflow y el comportamiento del motor de visión.
 
-**Casos a probar:**
-
-| Prueba | Pasos | Resultado Esperado |
-|--------|-------|--------------------|
-| **Token expirado** | Esperar 24 horas con sesión activa y recargar | Redirige al login |
-| **Acceso sin login** | Abrir directamente http://localhost:5000/dashboard.html | Redirige al login |
-| **Acceso admin sin permisos** | Siendo usuario normal, ir a http://localhost:5000/admin.html | Redirige al dashboard |
-| **Logout en múltiples pestañas** | Abrir 2 pestañas, cerrar sesión en una, usar la otra | Redirige al login |
-| **Navegación hacia atrás** | Después de logout, usar botón atrás del navegador | No permite acceder a páginas protegidas |
+1. **(Admin)** Abre **Ajustes** y verifica que la API key aparece **enmascarada** (por ejemplo: `****abcd`). ✅
+2. **Guarda** dejando la API key **vacía** y verifica que la clave existente **no se sobrescribe ni se pierde**. ✅
+3. Pulsa **Probar conexión** y verifica que el indicador responde **OK o Error de forma coherente** con el estado real. ✅
+4. Cambia el **modo por defecto**, guarda y verifica que **los motores se recargan** con el nuevo modo. ✅
+5. **(Permisos)** Como usuario **no administrador**, intenta `PUT /api/settings/vision` y verifica que se devuelve **`403`**. ❌
 
 ---
 
-### PRUEBA 9: Validaciones de Formularios
+### 5.7 Dashboard Rediseñado (pestañas + roles)
 
-**Objetivo:** Verificar que las validaciones funcionan correctamente.
+**Qué es:** La pantalla principal, organizada en pestañas que cambian según el rol del usuario.
 
-**Campos a probar en Registro:**
-
-| Campo | Prueba | Resultado Esperado |
-|-------|--------|--------------------|
-| **Contraseña corta** | Ingresar "Ab1" | Error: mínimo 8 caracteres |
-| **Sin mayúscula** | Ingresar "test1234" | Error: requiere al menos 1 mayúscula |
-| **Sin minúscula** | Ingresar "TEST1234" | Error: requiere al menos 1 minúscula |
-| **Sin número** | Ingresar "TestTest" | Error: requiere al menos 1 número |
-| **Correo duplicado** | Usar correo ya registrado | Error: correo ya existe |
-| **Usuario duplicado** | Usar username ya registrado | Error: usuario ya existe |
-| **Documento duplicado** | Usar documento ya registrado | Error: documento ya existe |
-| **Cédula inválida** | Ingresar "123" | Error: debe tener 7-8 dígitos |
-| **Teléfono inválido** | Ingresar "123" | Error: formato 04141234567 |
-
-**Campos a probar en Login:**
-
-| Campo | Prueba | Resultado Esperado |
-|-------|--------|--------------------|
-| **Campos vacíos** | Enviar formulario vacío | Mensaje de completar campos |
-| **Solo espacios** | Ingresar espacios en blanco | Mensaje de completar campos |
+1. Inicia como **usuario estándar** y verifica que las pestañas **Admin** y **Ajustes no aparecen**. ✅
+2. Inicia como **admin** y verifica que **ambas pestañas están visibles y funcionales**. ✅
+3. Abre una cámara en **pantalla completa** y verifica que usa el **stream anotado** si la visión está activa. ✅
+4. Navega entre pestañas y verifica que **los streams se detienen** al salir de Monitoreo (no siguen consumiendo en segundo plano). ✅
 
 ---
 
-### PRUEBA 10: Interfaz de Usuario (UI/UX)
+### 5.8 Panel de Administración (Usuarios + Cámaras + Salud)
 
-**Objetivo:** Verificar la apariencia y usabilidad de la interfaz.
+**Qué es:** Las herramientas del administrador para gestionar usuarios, cámaras y ver el estado del sistema.
 
-**Verificar en cada página:**
-
-- [ ] Los iconos SVG se muestran correctamente
-- [ ] El logo de Argos2 aparece en todas las páginas
-- [ ] Los colores y estilos son consistentes
-- [ ] Los botones responden al hover (cambio visual al pasar el mouse)
-- [ ] Los mensajes de error se muestran correctamente (toast notifications)
-- [ ] Los enlaces entre páginas funcionan (login → registro, login → recuperar, etc.)
-- [ ] La interfaz se ve bien en ventana normal y maximizada
-- [ ] No hay elementos superpuestos o desalineados
+1. **(Admin)** Cambia el **rol de otro usuario** y verifica que **se aplica y persiste** tras recargar. ✅
+2. **(Anti-self)** Intenta **modificar tu propio rol/estado o eliminarte** y verifica que **se bloquea** (no puedes autodescartarte ni quitarte permisos). ❌
+3. **Desactiva** un usuario y verifica que **ya no puede iniciar sesión**. ✅
+4. Usa **Escanear ESP32** y verifica que **detecta dispositivos** en la subred `/24`. ✅
+5. **Reinicia o Elimina** una cámara desde el panel y verifica que el **efecto es inmediato en Monitoreo**. ✅
 
 ---
 
-## 📝 Plantilla de Reporte de Bugs
+### 5.9 Autenticación + Correo
 
-Al encontrar un problema, usa este formato:
+**Qué es:** El registro, la verificación por correo, el inicio/cierre de sesión y la recuperación de contraseña.
 
-```
-### BUG #[número]: [Título descriptivo]
-
-**Severidad:** [Alta / Media / Baja]
-**Página:** [Login / Registro / Verificación / Recuperar / Admin / Dashboard]
-**Navegador:** [Chrome / Firefox / Edge / Otro]
-
-**Pasos para reproducir:**
-1. 
-2. 
-3. 
-
-**Resultado esperado:**
-[Lo que debería pasar]
-
-**Resultado actual:**
-[Lo que realmente pasa]
-
-**Captura de pantalla:**
-[Pegar imagen si es posible]
-
-**Mensaje de consola (si aplica):**
-[Pegar error de la consola del navegador - F12 > Console]
-```
+1. **Regístrate** y verifica que **llega el correo con el código de 6 dígitos** (revisa Spam si no lo ves). ✅
+2. **(Negativo)** Introduce un código **expirado o errado** → debe ser **rechazado**; luego introduce el **correcto** → **activación**. ❌➡️✅
+3. Haz **logout** y verifica que el *access token* queda en **lista negra** (las peticiones posteriores devuelven `401`). ✅
+4. Usa **Recuperar contraseña**, recibe el código y **restablece** con una contraseña válida; verifica que el **login posterior funciona**. ✅
+5. **(Negativo)** Registra una contraseña **sin carácter especial ni mayúscula** y verifica que el **backend la rechaza**. ❌
 
 ---
 
-## ✅ Checklist del Betatester
+### 5.10 PWA (instalable + offline)
 
-### Instalación
-- [ ] El instalador funciona correctamente
-- [ ] El servidor inicia sin errores
-- [ ] La página principal carga en el navegador
+**Qué es:** Argos2 es una *Progressive Web App*: se puede instalar como una app y funciona parcialmente sin conexión.
 
-### Autenticación
-- [ ] Registro de nuevo usuario funciona
-- [ ] Verificación de correo funciona
-- [ ] Login con usuario verificado funciona
-- [ ] Logout funciona correctamente
-- [ ] Recuperación de contraseña funciona
-
-### Administración
-- [ ] Panel de admin carga correctamente
-- [ ] Lista de usuarios se muestra
-- [ ] Cambio de rol funciona
-- [ ] Activar/Desactivar usuario funciona
-- [ ] Eliminar usuario funciona
-
-### Dashboard
-- [ ] Dashboard carga correctamente
-- [ ] Formulario de imagen se muestra
-- [ ] Selector de operación funciona
-
-### Seguridad
-- [ ] No se puede acceder a páginas protegidas sin login
-- [ ] No se puede acceder al panel admin sin ser admin
-- [ ] Logout cierra sesión correctamente
-
-### UI/UX
-- [ ] Interfaz visual consistente
-- [ ] Mensajes de error claros
-- [ ] Navegación fluida entre páginas
-- [ ] No hay errores en consola del navegador
+1. Abre la app en **Chrome** (Android o escritorio) y verifica que aparece el **prompt "Instalar"**. ✅
+2. **Instálala** y verifica que **abre en modo standalone** (sin la barra del navegador). ✅
+3. **(Offline)** Con conexión, navega por la app; luego **desconéctate de internet** y verifica que **las páginas cacheadas cargan**, mientras que las rutas `/api/` **no** se cachean (deben fallar con elegancia). ✅
+4. Verifica que el **icono se muestra correctamente** (versiones 192 y 512). ✅
 
 ---
 
-## 📞 Contacto para Reportes
+### 5.11 Rate Limiting / Seguridad
 
-Enviar todos los reportes de bugs al equipo de desarrollo con el formato indicado arriba.  
-Incluir capturas de pantalla cuando sea posible para facilitar la reproducción del problema.
+**Qué es:** Los límites que protegen a Argos2 del abuso (demasiados intentos en poco tiempo).
 
-**¡Gracias por participar como betatester de Argos2! 🎉**
+1. **(Login)** Intenta hacer login fallido **5 o más veces en un minuto** y verifica que la respuesta es **`429` con un campo `retry_after`**. ✅
+2. **(Registro)** Intenta registrarte **4 veces en una hora** y verifica que se aplica el **bloqueo**. ✅
+3. **(Privacidad)** Verifica que el error `429` **no expone trazas internas del servidor** (solo un **mensaje JSON limpio**). ✅
+
+---
+
+### 5.12 Salud del Sistema / Documentación API
+
+**Qué es:** Endpoints públicos que muestran el estado del sistema y la lista de endpoints disponibles.
+
+1. `GET /health` debe responder **`200`** con un **JSON de estado** y **sin requerir autenticación**. ✅
+2. `GET /api` debe **listar los endpoints disponibles** y sus **métodos** (GET, POST, PUT, etc.). ✅
+
+> 💡 Puedes probar estos endpoints directamente en el navegador: <http://localhost:5000/health> y <http://localhost:5000/api>.
+
+---
+
+## 📝 6. Cómo reportar: uso de la ficha `Ficha_Betatester.xlsx`
+
+Para reportar todo lo que encuentres usaremos una **ficha de Excel** rellenable. Está en [`Ficha_Betatester.xlsx`](Ficha_Betatester.xlsx) (en la raíz del proyecto).
+
+### Qué contiene la ficha
+La ficha tiene **4 hojas**:
+
+| Hoja | Para qué sirve |
+|------|----------------|
+| **Instrucciones** | Guía rápida de uso de la ficha. |
+| **Reportes** | Aquí rellenas **una fila por cada hallazgo**. Las columnas *Módulo*, *Tipo*, *Severidad* y *Estado* son **desplegables**. |
+| **Checklist de Pruebas** | Lista de funcionalidades para marcar **cuáles probaste** y cómo te fue. |
+| **Listas** *(oculta)* | Contiene los valores de los desplegables. No la modifiques. |
+
+### Paso a paso
+
+1. **Abre la ficha** con **Microsoft Excel** o **LibreOffice Calc**.
+2. Consulta primero la hoja **"Instrucciones"** para entender el formato.
+3. Ve a la hoja **"Reportes"** y **rellena una fila por cada problema u observación**:
+   - **ID Reporte:** ya viene prellenado (`RPT-001`, `RPT-002`, …). Usa el siguiente libre.
+   - **Fecha:** día en que encontraste el problema.
+   - **Betatester:** tu nombre.
+   - **Módulo** *(desplegable):* dónde ocurrió (Autenticación, Cámaras, Visión, etc.).
+   - **Tipo** *(desplegable):* qué clase de reporte es (ver tabla más abajo).
+   - **Severidad** *(desplegable):* qué tan grave es (ver tabla más abajo).
+   - **Navegador/SO:** dónde lo probaste (ej. `Chrome / Windows 11`).
+   - **Pasos para reproducir:** numera los pasos exactos para que podamos repetirlo.
+   - **Resultado esperado:** qué **debería** pasar.
+   - **Resultado actual:** qué **pasa en realidad**.
+   - **Evidencia (archivo/ruta):** nombre del archivo de captura si adjuntas uno.
+   - **Estado** *(desplegable):* déjalo en **"Nuevo"** salvo que te indiquen otra cosa.
+   - **Notas/Resolución:** cualquier comentario extra.
+   - 🗑️ **Borra las dos filas amarillas de EJEMPLO** antes de enviar la ficha.
+4. Ve a la hoja **"Checklist de Pruebas"** y marca, para cada funcionalidad, si la **probaste** (Sí/No/No aplica) y el **resultado** (OK/Con errores/No pude probarla).
+5. **Guarda** el archivo (mismo nombre, `Ficha_Betatester.xlsx`).
+6. **Envíalo por correo** a **sqprpject@gmail.com**.
+
+### Cómo clasificar la Severidad
+
+| Nivel | Significado |
+|-------|-------------|
+| **Crítica (bloquea uso)** | Impide usar la aplicación por completo. No hay forma de continuar. |
+| **Alta (función clave rota)** | Una función principal no funciona, pero la app no se cae entera. |
+| **Media (workaround existe)** | Hay un error, pero existe una forma alternativa de lograr la tarea. |
+| **Baja (cosmético/menor)** | Detalle visual o menor que no afecta a la funcionalidad. |
+| **Informativa** | Comentario, sugerencia u observación; no es un error como tal. |
+
+### Cómo clasificar el Tipo
+
+| Tipo | Significado |
+|------|-------------|
+| **Bug funcional** | Algo no funciona como debería. |
+| **Error visual/CSS** | Fallo de diseño: desalineación, colores, superposición, etc. |
+| **Bug de rendimiento/lentitud** | Va lento, se cuelga o consume muchos recursos. |
+| **Fallo de seguridad** | Posible brecha, acceso sin permiso o datos expuestos. |
+| **Sugerencia de mejora** | Idea para mejorar la aplicación. |
+| **Duda/Consulta** | Pregunta sobre cómo funciona algo. |
+| **Documentación** | Error o ausencia en la ayuda o el manual. |
+| **Otro** | Cualquier cosa que no encaje en las categorías anteriores. |
+
+### Sobre las capturas (Evidencia)
+- Si puedes, **adjunta una captura de pantalla o un video corto** del problema.
+- **Nombra el archivo** de forma descriptiva, por ejemplo: `camara_congelada_monitoreo.png`.
+- Ese mismo nombre ponlo en la columna **"Evidencia"** del reporte, para que sepamos a qué te refieres.
+- Adjunta las capturas **junto con la ficha** en el correo.
+
+---
+
+## ✅ 7. Checklist de Cierre
+
+Antes de dar por terminado tu betatest, verifica lo siguiente:
+
+- [ ] Instalé Argos2 correctamente y el servidor arranca sin errores.
+- [ ] Me registré, verifiqué mi correo e inicié sesión.
+- [ ] Probé las **12 categorías** del Plan de Pruebas (sección 5).
+- [ ] Rellene **una fila por cada hallazgo** en la hoja "Reportes".
+- [ ] **Borré las filas de EJEMPLO** de la ficha.
+- [ ] Marqué la hoja **"Checklist de Pruebas"** indicando qué probé.
+- [ ] **Adjunté capturas** y puse sus nombres en la columna "Evidencia".
+- [ ] **Guardé** el archivo `Ficha_Betatester.xlsx`.
+- [ ] **Envié la ficha (y las capturas)** por correo a **sqprpject@gmail.com**.
+
+---
+
+## 📞 8. Contacto
+
+Para dudas durante el betatest o para enviar tu ficha de reporte:
+
+**📧 sqprpject@gmail.com**
+
+**¡Gracias por tu tiempo y por ayudar a mejorar Argos2! 🎉**
