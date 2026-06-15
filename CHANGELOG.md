@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026-06-15] - Publicación a GitHub: commit y push final de módulos de cámara, configuración y visión
+- **Archivos Modificados:** `CHANGELOG.md` (registro), más 43 archivos en el commit `a0b5100` (`.gitignore`, `Backend/routes/camera.py`, `Backend/routes/settings.py`, `Backend/services/camera_service.py`, `Backend/services/settings_service.py`, `Backend/services/vision_engine.py`, `Backend/services/email_service.py`, `Backend/tests/*`, `Frontend/js/*`, `Frontend/assets/icons/*`, `docs/*`, `.env.example`, `install.bat`, `install.sh`, etc.)
+- **Acción:** Añadido / Modificado
+- **Descripción Técnica:** Fase final de publicación a `origin main` (`https://github.com/Induraxxe/-Argos2.git`). (1) Se ejecutó `git add .gitignore` (confirmado staged: antes se auto-excluía) seguido de `git add .` respetando el `.gitignore`. (2) **Verificación de seguridad del staging (crítica)**: `git status --short`, `git ls-files --cached | findstr` y consulta de paths exactos confirmaron que NO entraron al index archivos sensibles (`.env` real, `Backend/argos2.db`/`.db-shm`/`.db-wal`, `__pycache__/`, `.pyc`, `venv/`, `.pytest_cache/`, `.clinerules`, `plans/`); las únicas coincidencias del filtro fueron falsos positivos seguros (`.env.example` plantilla sin credenciales y `Backend/database/db.py` módulo de código). (3) Commit `a0b5100` con mensaje descriptivo multi-`-m` (43 archivos, +16728/-72). (4) Push fast-forward `f67faa8..a0b5100 main -> main` sin credenciales interactivas (credential helper). (5) Verificación: `git status` = *"up to date with 'origin/main'"* + working tree clean; `git log` muestra `a0b5100` en HEAD. No se usó `--force` en ningún momento.
+- **Estado:** Completado
+
 ## [2026-06-15] - Sanitización de credenciales y corrección de .gitignore para push a GitHub
 - **Archivos Modificados:** `Backend/services/email_service.py`, `.env.example`, `install.bat`, `install.sh`, `.gitignore`
 - **Acción:** Modificado
