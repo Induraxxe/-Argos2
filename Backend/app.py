@@ -7,8 +7,16 @@ from flask import Flask, jsonify, send_from_directory, render_template_string, r
 from flask_cors import CORS
 import atexit
 import os
+import logging
 from datetime import datetime, timezone
 from dotenv import load_dotenv
+
+# Habilitar logging a nivel INFO para visibilidad del pipeline de visión
+# (mensajes INFO/WARNING del vision engine y camera service en consola).
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s [%(name)s] %(message)s',
+)
 
 # Cargar variables de entorno desde .env (antes de cualquier uso)
 load_dotenv()

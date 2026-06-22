@@ -1,34 +1,50 @@
-bcrypt==5.0.0
-blinker==1.9.0
-click==8.3.2
-colorama==0.4.6
-Flask==3.1.3
-flask-cors==6.0.2
-itsdangerous==2.2.0
-Jinja2==3.1.6
-MarkupSafe==3.0.3
-numpy==2.2.6
-opencv-python==4.13.0.92
-PyJWT==2.12.1
-typing_extensions==4.15.0
-Werkzeug==3.1.8
-python-dotenv==1.1.0
-Flask-Limiter>=3.12
-requests>=2.31.0
+# ============================================================================
+# Argos2 — Dependencias del Backend (Flask API + Visión Computacional)
+# ============================================================================
+# SIN versiones fijadas: pip resuelve la versión más reciente compatible,
+# evitando roturas por incompatibilidad de versiones específicas.
+#
+# Las dependencias transitivas (Werkzeug, Jinja2, MarkupSafe, click,
+# itsdangerous, blinker, colorama, typing_extensions, etc.) NO se listan
+# aquí: pip las instala automáticamente según lo requieran Flask y
+# Flask-Limiter. Fijarlas manualmente era la causa de roturas de instalación.
+# ============================================================================
 
-# ============================
-# Visión Computacional
-# ============================
-# Opción 2 (Cloud) — inferencia en la nube de Roboflow vía HTTP REST.
+# ----------------------------------------------------------------------------
+# Framework web y utilidades
+# ----------------------------------------------------------------------------
+Flask                  # Framework web (API REST)
+flask-cors             # Cabeceras CORS para el frontend
+Flask-Limiter          # Rate limiting (protección de endpoints)
+python-dotenv          # Carga de variables de entorno desde .env
+
+# ----------------------------------------------------------------------------
+# Autenticación y seguridad
+# ----------------------------------------------------------------------------
+PyJWT                  # Generación y validación de tokens JWT
+bcrypt                 # Hash de contraseñas
+
+# ----------------------------------------------------------------------------
+# Captura de vídeo y procesamiento de imágenes
+# ----------------------------------------------------------------------------
+opencv-python          # OpenCV (cv2): captura de vídeo y dibujado de overlays
+numpy                  # Operaciones con arrays (frames, detecciones, métricas)
+requests               # Cliente HTTP (sondeo de streams RTSP, comprobaciones)
+
+# ----------------------------------------------------------------------------
+# Visión computacional — Roboflow
+# ----------------------------------------------------------------------------
+# Opción 2 (Cloud): inferencia en la nube de Roboflow vía SDK.
 inference-sdk
 
-# Opción 3 (Local/Edge) — inferencia local con el paquete `inference`.
+# Opción 3 (Local/Edge): inferencia local con el paquete `inference`.
 # NOTA: es una dependencia PESADA (arrastra torch/onnxruntime, ~2 GB).
-# Por eso se deja comentada por defecto. Instalar SOLO si se usa modo local:
-#   pip install inference
+# Descomenta las líneas siguientes SOLO si vas a usar inferencia LOCAL:
 # inference
 # torch
 # onnxruntime
-#
-# pytest — framework de pruebas (necesario para Backend/tests/).
-pytest
+
+# ----------------------------------------------------------------------------
+# Pruebas
+# ----------------------------------------------------------------------------
+pytest                 # Framework de tests (necesario para Backend/tests/)

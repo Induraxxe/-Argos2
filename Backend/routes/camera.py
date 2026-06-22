@@ -657,12 +657,33 @@ def start_vision(current_user, camera_id):
         }), 400
 
     status = camera_manager.get_vision_status(camera_id)
+    active_mode = status.get('mode', mode)
+    available = status.get('available', False)
+    detections = status.get('detections', {
+        'count': 0, 'labels': {}, 'timestamp': None
+    })
+
+    if not available:
+        # Motor creado pero no disponible: feedback accionable para el usuario.
+        return jsonify({
+            'message': (
+                f'Motor {active_mode} creado pero no disponible. '
+                'Verifica la API key y modelo en Ajustes.'
+            ),
+            'camera_id': camera_id,
+            'mode': active_mode,
+            'active': status.get('active', False),
+            'available': False,
+            'detections': detections,
+        }), 200
+
     return jsonify({
-        'message': f'Visión activada en modo {mode}',
+        'message': f'Visión activada en modo {active_mode}',
         'camera_id': camera_id,
-        'mode': status.get('mode', mode),
+        'mode': active_mode,
         'active': status.get('active', False),
-        'available': status.get('available', False),
+        'available': True,
+        'detections': detections,
     }), 200
 
 

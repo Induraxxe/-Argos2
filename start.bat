@@ -4,19 +4,20 @@ setlocal enabledelayedexpansion
 
 :: ============================================
 :: INICIADOR RAPIDO ARGOS2 - WINDOWS
+:: (Solo caracteres ASCII para compatibilidad cmd.exe)
 :: ============================================
 
 echo.
-echo ╔════════════════════════════════════════════════════════════╗
-echo ║           INICIADOR ARGOS2 - Windows                       ║
-echo ╚════════════════════════════════════════════════════════════╝
+echo ============================================================
+echo            INICIADOR ARGOS2 - Windows
+echo ============================================================
 echo.
 
 cd /d "%~dp0"
 
 :: Verificar si el entorno virtual existe
 if not exist "Backend\venv\Scripts\activate.bat" (
-    echo ❌ ERROR: El entorno virtual no existe.
+    echo [ERROR] El entorno virtual no existe.
     echo.
     echo    Por favor ejecute install.bat primero para instalar el sistema.
     echo.
@@ -30,13 +31,13 @@ call Backend\venv\Scripts\activate.bat
 :: Verificar si las dependencias estan instaladas
 python -c "import flask" 2>nul
 if errorlevel 1 (
-    echo ⚠️  Las dependencias no estan instaladas. Instalando...
+    echo [!] Las dependencias no estan instaladas. Instalando...
     pip install -r Backend\requirements.txt
 )
 
 :: Verificar que .env existe
 if not exist ".env" (
-    echo ❌ ERROR: El archivo .env no existe.
+    echo [ERROR] El archivo .env no existe.
     echo.
     echo    Por favor ejecute install.bat primero para configurar las variables de entorno.
     echo.
@@ -52,7 +53,7 @@ for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
         set "%%a=%%b"
     )
 )
-echo ✅ Variables de entorno cargadas
+echo [OK] Variables de entorno cargadas
 
 :: Crear directorios si no existen
 if not exist "Backend\uploads" mkdir "Backend\uploads"
@@ -60,7 +61,7 @@ if not exist "Backend\processed" mkdir "Backend\processed"
 
 :: Iniciar aplicacion
 echo.
-echo 🚀 Iniciando Argos2...
+echo ^>^>^> Iniciando Argos2...
 echo    Servidor: http://localhost:5000
 echo    Presione Ctrl+C para detener
 echo.

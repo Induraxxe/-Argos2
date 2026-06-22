@@ -30,6 +30,9 @@ Backend/argos2.db
 *.db-journal
 *.sqlite3
 
+# Configuración local de cámaras (estado del usuario; se autogenera al añadir cámaras)
+Backend/cameras_config.json
+
 # IDE
 .vscode/
 .idea/
@@ -41,6 +44,9 @@ Backend/argos2.db
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Artefactos basura de PowerShell (redirección malformada a $null)
+$null
 
 # Archivos temporales de bloqueo de Office (Excel/Word/...)
 ~$*

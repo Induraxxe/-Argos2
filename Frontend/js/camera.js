@@ -603,6 +603,10 @@ const CAMERA = {
             }
         }
 
+        // Refrescar el badge de detecciones en cada ciclo de polling (10s).
+        // No reinicia el stream MJPEG: solo actualiza visionState.detections.
+        this.refreshDetectionsBadges();
+
         this.updateStatusBar();
     },
 
@@ -691,6 +695,7 @@ const CAMERA = {
                     <button class="vision-segment cloud" data-mode="cloud" type="button" role="radio" aria-checked="false" title="Visión en la nube (Roboflow)">Cloud</button>
                     <button class="vision-segment local" data-mode="local" type="button" role="radio" aria-checked="false" title="Visión local (Edge AI)">Local</button>
                 </div>
+                <span class="detections-badge" data-detections hidden></span>
             </div>
         `;
     },
@@ -768,13 +773,53 @@ const CAMERA = {
             if (!res.ok) return;
             const data = await res.json();
             const mode = data.active ? (data.mode || 'cloud') : 'off';
-            this.visionState[cameraId] = { mode, loading: false };
+            const available = data.available === true;
+            const detections = data.detections || { count: 0, labels: {}, timestamp: null };
+            this.visionState[cameraId] = { mode, loading: false, available, detections };
             this.updateVisionSelectorUI(cameraId, mode);
             this._setStoredVisionMode(cameraId, mode);
+            // Refrescar el contador de detecciones en tiempo real (cada ciclo de polling)
+            this.updateDetectionsBadge(cameraId);
             // Sincronizar el stream para reflejar el estado real del backend
             this.switchVisionStream(cameraId, mode !== 'off');
         } catch (err) {
             console.warn(`[CAMERA] Error sincronizando visión de ${cameraId}:`, err.message);
+        }
+    },
+
+    /**
+     * Refresca ÚNICAMENTE las detecciones del badge de cada cámara consultando
+     * GET /vision/status. A diferencia de syncAllVisionStatus(), NO reinicia el
+     * stream MJPEG ni reevalúa el modo: solo actualiza visionState.detections y
+     * pinta el badge. Pensado para el polling periódico (cada 10s) dentro de
+     * refreshStatus(), de modo que el contador de detecciones se actualice en
+     * tiempo real sin cortar el video.
+     */
+    async refreshDetectionsBadges() {
+        if (!this.tabActive || this.cameras.length === 0) return;
+        for (const camera of this.cameras) {
+            try {
+                const res = await fetch(`${this.API_BASE}/${camera.id}/vision/status`, {
+                    headers: this.getAuthHeaders()
+                });
+                if (res.status === 401) {
+                    this.handleAuthError();
+                    return;
+                }
+                if (!res.ok) continue;
+                const data = await res.json();
+                const detections = data.detections || { count: 0, labels: {}, timestamp: null };
+                const prev = this.visionState[camera.id] || {};
+                // Conservar modo/disponibilidad/stream; solo refrescar detecciones
+                this.visionState[camera.id] = {
+                    ...prev,
+                    available: data.available === true,
+                    detections
+                };
+                this.updateDetectionsBadge(camera.id);
+            } catch (err) {
+                // Silencioso — no saturar la consola con errores de polling
+            }
         }
     },
 
@@ -825,16 +870,31 @@ const CAMERA = {
             if (mode === 'off') {
                 await this._deactivateVision(cameraId);
                 showToast('Visión desactivada', 'info');
+                this.visionState[cameraId] = {
+                    mode, loading: false,
+                    available: false,
+                    detections: { count: 0, labels: {}, timestamp: null }
+                };
             } else {
-                await this._activateVision(cameraId, mode);
-                showToast(`Visión activada: modo ${mode}`, 'success');
+                const result = await this._activateVision(cameraId, mode);
+                // _activateVision ya guardó available/detections en visionState;
+                // si el motor no estaba disponible mostró el toast de advertencia.
+                if (!result || result.available !== false) {
+                    showToast(`Visión activada: modo ${mode}`, 'success');
+                }
+                // Conservar available/detections devueltos por el backend
+                this.visionState[cameraId] = {
+                    ...(this.visionState[cameraId] || {}),
+                    mode, loading: false
+                };
             }
-            this.visionState[cameraId] = { mode, loading: false };
             // BUGFIX: refrescar la UI para salir del estado "cargando", detener
             // la animación de pulso y re-habilitar los segmentos según su
             // disponibilidad. Sin esta llamada, el selector quedaba bloqueado
             // hasta la próxima recarga de página.
             this.updateVisionSelectorUI(cameraId, mode, false);
+            // Refrescar el contador de detecciones según el estado real del backend
+            this.updateDetectionsBadge(cameraId);
         } catch (err) {
             console.error(`[CAMERA] Error cambiando visión de ${cameraId} a ${mode}:`, err.message);
             showToast(`Error al activar visión (${mode}). Revertiendo…`, 'error');
@@ -843,6 +903,7 @@ const CAMERA = {
             this.updateVisionSelectorUI(cameraId, prevState, false);
             this._setStoredVisionMode(cameraId, prevState);
             this.switchVisionStream(cameraId, prevState !== 'off');
+            this.updateDetectionsBadge(cameraId);
         }
     },
 
@@ -867,8 +928,29 @@ const CAMERA = {
             const data = await res.json().catch(() => ({}));
             throw new Error(data.error || `Error ${res.status}`);
         }
-        // Cambiar al stream MJPEG anotado
+
+        // Parsear la respuesta para extraer disponibilidad y detecciones
+        const data = await res.json().catch(() => ({}));
+        const available = data.available === true;
+        const detections = data.detections || { count: 0, labels: {}, timestamp: null };
+        // Persistir disponibilidad y detecciones devueltas por el backend
+        this.visionState[cameraId] = {
+            ...(this.visionState[cameraId] || {}),
+            available,
+            detections
+        };
+
+        if (!available) {
+            // Motor cloud creado pero NO disponible (p.ej. API key/modelo inválidos):
+            // advertir al usuario en lugar de un toast de éxito.
+            const msg = data.message || '⚠️ Motor cloud no disponible. Revisa la API key y modelo en Ajustes → Visión.';
+            showToast(msg, 'warning', 6000);
+            this.updateDetectionsBadge(cameraId);
+        }
+
+        // Cambiar al stream MJPEG anotado (se muestra el video aunque no haya detecciones)
         this.switchVisionStream(cameraId, true);
+        return data;
     },
 
     /**
@@ -971,6 +1053,75 @@ const CAMERA = {
                 // Restaurar disponibilidad según los modos del backend
                 const m = seg.dataset.mode;
                 seg.disabled = !(m === 'off' || this.visionModes.includes(m));
+            }
+        });
+    },
+
+    /**
+     * Actualiza (o inyecta si no existe) el badge de detecciones en tiempo real
+     * de una cámara. Se invoca en cada ciclo de polling (syncVisionStatus) y tras
+     * activar/desactivar la visión.
+     *
+     * Estados del badge:
+     *  - Visión Off                  → oculto.
+     *  - Activo y disponible         → "🔍 N detecciones" (o "🔍 Sin detecciones").
+     *  - Activo pero no disponible   → "⚠️ Sin procesar" (estilo de advertencia).
+     *
+     * @param {string} cameraId - ID de la cámara.
+     */
+    updateDetectionsBadge(cameraId) {
+        const state = this.visionState[cameraId] || {};
+        const mode = state.mode || 'off';
+        const available = state.available === true;
+        const count = (state.detections && state.detections.count) || 0;
+
+        // Determinar texto y estado visual del badge
+        let text = '';
+        let extraClass = '';
+
+        if (mode === 'off') {
+            // Visión desactivada: ocultar el badge
+            text = '';
+        } else if (!available) {
+            // Motor activo pero no está procesando (p.ej. API key inválida)
+            text = '⚠️ Sin procesar';
+            extraClass = 'warning';
+        } else if (count > 0) {
+            text = `🔍 ${count} detecciones`;
+            extraClass = 'active';
+        } else {
+            text = '🔍 Sin detecciones';
+            extraClass = 'empty';
+        }
+
+        // Recolectar todas las tarjetas que muestran esta cámara (grid + single)
+        const cards = [];
+        document.querySelectorAll(`.camera-card[data-camera-id="${cameraId}"]`)
+            .forEach(c => cards.push(c));
+        if (this._singleCameraId === cameraId) {
+            const singleView = document.getElementById('single-camera');
+            const singleCard = singleView ? singleView.querySelector('.camera-card') : null;
+            if (singleCard) cards.push(singleCard);
+        }
+
+        cards.forEach(card => {
+            const control = card.querySelector('.vision-control');
+            if (!control) return;
+
+            // Buscar o crear el badge (robusto frente a tarjetas estáticas)
+            let badge = control.querySelector('.detections-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                control.appendChild(badge);
+            }
+
+            badge.className = `detections-badge ${extraClass}`.trim();
+            if (text) {
+                badge.textContent = text;
+                badge.hidden = false;
+            } else {
+                badge.textContent = '';
+                badge.hidden = true;
             }
         });
     },
