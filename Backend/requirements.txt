@@ -45,6 +45,16 @@ inference-sdk
 # onnxruntime
 
 # ----------------------------------------------------------------------------
+# Servidores WSGI de producción (sustituyen al dev server de Flask/werkzeug)
+# ----------------------------------------------------------------------------
+# Cada stream MJPEG de visión es una conexión LARGA que retiene un hilo del
+# servidor durante toda su duración. El dev server de werkzeug (app.run) se
+# degrada con varios visores/cámaras; estos servidores exponen un pool de
+# threads generoso que evita agotar el pool bajo carga de streams.
+waitress               # Servidor WSGI puro-Python, MULTIPLATAFORMA (Windows/Linux/mac). Usado por start.bat.
+gunicorn               # Servidor WSGI estándar Unix (workers/threads). Usado por start.sh. NO funciona en Windows (usa fork).
+
+# ----------------------------------------------------------------------------
 # Pruebas
 # ----------------------------------------------------------------------------
 pytest                 # Framework de tests (necesario para Backend/tests/)
